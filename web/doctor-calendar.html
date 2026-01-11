@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カレンダー - MediMatch 医師用</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .calendar-container {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+        
+        .calendar-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .calendar-view-switcher {
+            display: flex;
+            gap: var(--spacing-xs);
+            background-color: var(--gray-100);
+            padding: 4px;
+            border-radius: var(--border-radius-md);
+        }
+        
+        .view-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            background-color: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .view-btn:hover {
+            color: var(--primary-blue);
+        }
+        
+        .view-btn.active {
+            background-color: white;
+            color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+        }
+        
+        .calendar-day-header {
+            background-color: var(--gray-100);
+            padding: var(--spacing-md);
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .calendar-day-header.sunday {
+            color: var(--error);
+        }
+        
+        .calendar-day-header.saturday {
+            color: var(--primary-blue);
+        }
+        
+        .calendar-day {
+            background-color: white;
+            min-height: 120px;
+            padding: var(--spacing-sm);
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--gray-50);
+        }
+        
+        .calendar-day.other-month {
+            background-color: var(--gray-50);
+            opacity: 0.5;
+        }
+        
+        .calendar-day.today {
+            background-color: var(--light-blue-bg);
+        }
+        
+        .calendar-day-number {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .calendar-day.sunday .calendar-day-number {
+            color: var(--error);
+        }
+        
+        .calendar-day.saturday .calendar-day-number {
+            color: var(--primary-blue);
+        }
+        
+        .calendar-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .calendar-event {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .calendar-event:hover {
+            transform: translateX(2px);
+        }
+        
+        .event-work {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .event-available {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .event-interview {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .event-other {
+            background-color: var(--gray-300);
+            color: var(--text-primary);
+        }
+        
+        .legend {
+            display: flex;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background-color: var(--gray-50);
+            border-radius: var(--border-radius-md);
+            margin-top: var(--spacing-xl);
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-sm);
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .stat-box {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .stat-box-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stat-box-value {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        
+        .stat-box-sub {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+        
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-header {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-md);
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--gray-100);
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: var(--spacing-xl);
+        }
+        
+        .modal-footer {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+        }
+        
+        .event-type-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .event-type-option {
+            padding: var(--spacing-lg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .event-type-option:hover {
+            border-color: var(--primary-blue);
+            background-color: var(--light-blue-bg);
+        }
+        
+        .event-type-option.selected {
+            border-color: var(--primary-blue);
+            background-color: var(--light-blue-bg);
+        }
+        
+        .event-type-icon {
+            font-size: 32px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .event-type-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .event-type-desc {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+        
+        @media (max-width: 768px) {
+            .calendar-day {
+                min-height: 80px;
+                padding: var(--spacing-xs);
+            }
+            
+            .calendar-event {
+                font-size: 10px;
+                padding: 1px 4px;
+            }
+            
+            .calendar-header {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+            
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="doctor-home.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav" role="navigation" aria-label="メインナビゲーション">
+                <a href="doctor-home.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>ホーム</span>
+                </a>
+                
+                <a href="doctor-job-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>求人検索</span>
+                </a>
+                
+                <a href="doctor-scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト</span>
+                    <span class="badge badge-error" style="margin-left: auto;">8</span>
+                </a>
+                
+                <a href="doctor-applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                </a>
+                
+                <a href="doctor-messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">2</span>
+                </a>
+                
+                <a href="doctor-calendar.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span>カレンダー</span>
+                </a>
+                
+                <a href="doctor-profile.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>プロフィール</span>
+                </a>
+                
+                <a href="doctor-settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6"></path>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">カレンダー</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">田</div>
+                            <span id="userName">田中太郎</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">田中太郎 医師</div>
+                                <div class="dropdown-menu-user-email">doctor@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="doctor-profile.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>プロフィール</span>
+                                </a>
+                                <a href="doctor-settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="breadcrumb mb-lg">
+                    <a href="doctor-home.html">ホーム</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>カレンダー</span>
+                </div>
+                
+                <!-- 統計 -->
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-box-label">今月の勤務日数</div>
+                        <div class="stat-box-value">12日</div>
+                        <div class="stat-box-sub">常勤8日 + 非常勤4日</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-box-label">募集中の空き時間</div>
+                        <div class="stat-box-value">5日</div>
+                        <div class="stat-box-sub">オファー待ち</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-box-label">今月の予想収入</div>
+                        <div class="stat-box-value">¥980K</div>
+                        <div class="stat-box-sub">前月比 +15%</div>
+                    </div>
+                </div>
+                
+                <!-- カレンダー -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button class="btn btn-outline btn-sm" onclick="previousMonth()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </button>
+                            <div class="calendar-title" id="calendarTitle">2026年1月</div>
+                            <button class="btn btn-outline btn-sm" onclick="nextMonth()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="goToToday()">今日</button>
+                        </div>
+                        
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <button class="btn btn-primary" onclick="openAddEventModal()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                予定を追加
+                            </button>
+                            <button class="btn btn-outline" onclick="syncGoogleCalendar()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                </svg>
+                                Google連携
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- JavaScriptで動的生成 -->
+                    </div>
+                    
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color event-work"></div>
+                            <span>勤務予定</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color event-available"></div>
+                            <span>空き時間（募集中）</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color event-interview"></div>
+                            <span>面接・面談</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color event-other"></div>
+                            <span>その他</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 予定追加モーダル -->
+    <div id="addEventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">予定を追加</h2>
+                <button class="modal-close" onclick="closeAddEventModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="event-type-selector">
+                    <div class="event-type-option selected" data-type="work">
+                        <div class="event-type-icon">💼</div>
+                        <div class="event-type-label">勤務予定</div>
+                        <div class="event-type-desc">常勤・非常勤の勤務</div>
+                    </div>
+                    <div class="event-type-option" data-type="available">
+                        <div class="event-type-icon">✨</div>
+                        <div class="event-type-label">空き時間募集</div>
+                        <div class="event-type-desc">スポット勤務を募集</div>
+                    </div>
+                    <div class="event-type-option" data-type="interview">
+                        <div class="event-type-icon">🤝</div>
+                        <div class="event-type-label">面接・面談</div>
+                        <div class="event-type-desc">施設との面談予定</div>
+                    </div>
+                    <div class="event-type-option" data-type="other">
+                        <div class="event-type-icon">📅</div>
+                        <div class="event-type-label">その他</div>
+                        <div class="event-type-desc">プライベート予定</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>タイトル</label>
+                    <input type="text" class="input" id="eventTitle" placeholder="予定のタイトル">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>開始日時</label>
+                        <input type="datetime-local" class="input" id="eventStart">
+                    </div>
+                    <div class="form-group">
+                        <label>終了日時</label>
+                        <input type="datetime-local" class="input" id="eventEnd">
+                    </div>
+                </div>
+                
+                <div class="form-group" id="availableOptions" style="display: none;">
+                    <label>募集条件</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>希望時給</label>
+                            <input type="number" class="input" placeholder="10,000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>診療科</label>
+                            <select class="select">
+                                <option>内科</option>
+                                <option>外科</option>
+                                <option>整形外科</option>
+                                <option>小児科</option>
+                                <option>その他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>メモ</label>
+                    <textarea class="textarea" rows="3" id="eventMemo" placeholder="詳細やメモを入力"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddEventModal()">キャンセル</button>
+                <button class="btn btn-primary" onclick="saveEvent()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        let currentYear = 2026;
+        let currentMonth = 0; // 0-11 (January = 0)
+        let selectedEventType = 'work';
+        
+        // デモイベントデータ
+        const events = {
+            '2026-01-15': [
+                { type: 'work', title: '東京総合病院（常勤）', time: '09:00' }
+            ],
+            '2026-01-16': [
+                { type: 'work', title: '東京総合病院（常勤）', time: '09:00' }
+            ],
+            '2026-01-17': [
+                { type: 'available', title: '空き時間募集中', time: '終日' }
+            ],
+            '2026-01-18': [
+                { type: 'work', title: 'さくらクリニック（非常勤）', time: '14:00' }
+            ],
+            '2026-01-20': [
+                { type: 'interview', title: '◯◯病院 面談', time: '15:00' }
+            ],
+            '2026-01-22': [
+                { type: 'work', title: '東京総合病院（常勤）', time: '09:00' }
+            ],
+            '2026-01-23': [
+                { type: 'work', title: '東京総合病院（常勤）', time: '09:00' }
+            ],
+            '2026-01-24': [
+                { type: 'available', title: '空き時間募集中', time: '午前' }
+            ],
+            '2026-01-25': [
+                { type: 'work', title: 'さくらクリニック（非常勤）', time: '14:00' }
+            ],
+            '2026-01-27': [
+                { type: 'other', title: '学会参加', time: '終日' }
+            ]
+        };
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCalendar();
+            
+            // イベントタイプ選択
+            document.querySelectorAll('.event-type-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.event-type-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedEventType = this.dataset.type;
+                    
+                    // 空き時間募集の場合は追加オプションを表示
+                    const availableOptions = document.getElementById('availableOptions');
+                    if (selectedEventType === 'available') {
+                        availableOptions.style.display = 'block';
+                    } else {
+                        availableOptions.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // ユーザー名設定
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // カレンダー描画
+        function renderCalendar() {
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const prevLastDay = new Date(currentYear, currentMonth, 0);
+            const firstDayIndex = firstDay.getDay();
+            const lastDate = lastDay.getDate();
+            const prevLastDate = prevLastDay.getDate();
+            
+            // タイトル更新
+            document.getElementById('calendarTitle').textContent = 
+                `${currentYear}年${currentMonth + 1}月`;
+            
+            // グリッド作成
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            // 曜日ヘッダー
+            const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+            dayNames.forEach((day, index) => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                if (index === 0) header.classList.add('sunday');
+                if (index === 6) header.classList.add('saturday');
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // 前月の日付
+            for (let i = firstDayIndex; i > 0; i--) {
+                const day = createDayElement(prevLastDate - i + 1, true, false);
+                grid.appendChild(day);
+            }
+            
+            // 当月の日付
+            const today = new Date();
+            for (let i = 1; i <= lastDate; i++) {
+                const isToday = currentYear === today.getFullYear() && 
+                               currentMonth === today.getMonth() && 
+                               i === today.getDate();
+                const day = createDayElement(i, false, isToday);
+                grid.appendChild(day);
+            }
+            
+            // 次月の日付
+            const nextDays = 7 - ((firstDayIndex + lastDate) % 7);
+            if (nextDays < 7) {
+                for (let i = 1; i <= nextDays; i++) {
+                    const day = createDayElement(i, true, false);
+                    grid.appendChild(day);
+                }
+            }
+        }
+        
+        function createDayElement(date, isOtherMonth, isToday) {
+            const day = document.createElement('div');
+            day.className = 'calendar-day';
+            if (isOtherMonth) day.classList.add('other-month');
+            if (isToday) day.classList.add('today');
+            
+            const dayOfWeek = new Date(currentYear, currentMonth, date).getDay();
+            if (dayOfWeek === 0) day.classList.add('sunday');
+            if (dayOfWeek === 6) day.classList.add('saturday');
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'calendar-day-number';
+            dayNumber.textContent = date;
+            day.appendChild(dayNumber);
+            
+            // イベント表示
+            if (!isOtherMonth) {
+                const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                if (events[dateKey]) {
+                    const eventsContainer = document.createElement('div');
+                    eventsContainer.className = 'calendar-events';
+                    events[dateKey].forEach(event => {
+                        const eventEl = document.createElement('div');
+                        eventEl.className = `calendar-event event-${event.type}`;
+                        eventEl.textContent = `${event.time} ${event.title}`;
+                        eventEl.onclick = (e) => {
+                            e.stopPropagation();
+                            alert(`📅 ${event.title}\n⏰ ${event.time}`);
+                        };
+                        eventsContainer.appendChild(eventEl);
+                    });
+                    day.appendChild(eventsContainer);
+                }
+            }
+            
+            day.onclick = () => {
+                if (!isOtherMonth) {
+                    openAddEventModal(date);
+                }
+            };
+            
+            return day;
+        }
+        
+        function previousMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+        
+        function goToToday() {
+            const today = new Date();
+            currentYear = today.getFullYear();
+            currentMonth = today.getMonth();
+            renderCalendar();
+        }
+        
+        function openAddEventModal(date) {
+            const modal = document.getElementById('addEventModal');
+            modal.classList.add('show');
+            
+            // 日付設定
+            if (date) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                document.getElementById('eventStart').value = `${dateStr}T09:00`;
+                document.getElementById('eventEnd').value = `${dateStr}T18:00`;
+            }
+        }
+        
+        function closeAddEventModal() {
+            const modal = document.getElementById('addEventModal');
+            modal.classList.remove('show');
+            
+            // フォームリセット
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventMemo').value = '';
+        }
+        
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value;
+            if (!title) {
+                alert('⚠️ タイトルを入力してください');
+                return;
+            }
+            
+            alert('✅ 予定を保存しました！\n\n実際のアプリでは、カレンダーに追加されます。');
+            closeAddEventModal();
+        }
+        
+        function syncGoogleCalendar() {
+            alert('🔄 Googleカレンダーと同期しました！\n\n実際のアプリでは、Googleカレンダーの予定がインポートされます。');
+        }
+        
+        function signOut() {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+        
+        // モーダル外クリックで閉じる
+        document.getElementById('addEventModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddEventModal();
+            }
+        });
+    </script>
+</body>
+</html>

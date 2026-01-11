@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定 - MediMatch 医師用</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: var(--spacing-xl);
+        }
+        
+        .settings-nav {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            height: fit-content;
+            position: sticky;
+            top: var(--spacing-lg);
+        }
+        
+        .settings-nav-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-primary);
+        }
+        
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+            transition: all 0.2s ease;
+            margin-bottom: var(--spacing-xs);
+            cursor: pointer;
+        }
+        
+        .settings-nav-item:hover {
+            background-color: var(--gray-50);
+            color: var(--primary-blue);
+        }
+        
+        .settings-nav-item.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .settings-section {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .settings-section.hidden {
+            display: none;
+        }
+        
+        .settings-section-header {
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .settings-section-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .settings-section-description {
+            color: var(--text-muted);
+        }
+        
+        .settings-group {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .settings-group-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-primary);
+        }
+        
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .settings-item-info {
+            flex: 1;
+            margin-right: var(--spacing-lg);
+        }
+        
+        .settings-item-label {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .settings-item-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .settings-item-control {
+            flex-shrink: 0;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .form-group .help-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-300);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            background-color: var(--gray-50);
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 700;
+        }
+        
+        .danger-zone {
+            border: 2px solid var(--error);
+            background-color: var(--error-light);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+            margin-top: var(--spacing-xl);
+        }
+        
+        @media (max-width: 1024px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-nav {
+                position: static;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .settings-item {
+                flex-direction: column;
+            }
+            
+            .settings-item-info {
+                margin-right: 0;
+                margin-bottom: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="doctor-home.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav" role="navigation" aria-label="メインナビゲーション">
+                <a href="doctor-home.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>ホーム</span>
+                </a>
+                
+                <a href="doctor-job-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>求人検索</span>
+                </a>
+                
+                <a href="doctor-scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト</span>
+                    <span class="badge badge-error" style="margin-left: auto;">8</span>
+                </a>
+                
+                <a href="doctor-applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                </a>
+                
+                <a href="doctor-messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">2</span>
+                </a>
+                
+                <a href="doctor-calendar.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span>カレンダー</span>
+                </a>
+                
+                <a href="doctor-profile.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>プロフィール</span>
+                </a>
+                
+                <a href="doctor-settings.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6"></path>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">設定</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">田</div>
+                            <span id="userName">田中太郎</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">田中太郎 医師</div>
+                                <div class="dropdown-menu-user-email">doctor@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="doctor-profile.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>プロフィール</span>
+                                </a>
+                                <a href="doctor-settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="breadcrumb mb-lg">
+                    <a href="doctor-home.html">ホーム</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>設定</span>
+                </div>
+                
+                <!-- 設定レイアウト -->
+                <div class="settings-layout">
+                    <!-- 設定ナビゲーション -->
+                    <nav class="settings-nav">
+                        <div class="settings-nav-title">設定メニュー</div>
+                        <a class="settings-nav-item active" onclick="showSection('account')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            アカウント
+                        </a>
+                        <a class="settings-nav-item" onclick="showSection('profile')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            プロフィール
+                        </a>
+                        <a class="settings-nav-item" onclick="showSection('notifications')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            通知設定
+                        </a>
+                        <a class="settings-nav-item" onclick="showSection('privacy')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            プライバシー
+                        </a>
+                        <a class="settings-nav-item" onclick="showSection('security')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                            セキュリティ
+                        </a>
+                    </nav>
+                    
+                    <!-- 設定コンテンツ -->
+                    <div class="settings-content">
+                        <!-- アカウント設定 -->
+                        <div id="account-section" class="settings-section">
+                            <div class="settings-section-header">
+                                <h2 class="settings-section-title">アカウント設定</h2>
+                                <p class="settings-section-description">アカウント情報とログイン設定を管理します</p>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">プロフィール画像</h3>
+                                <div class="avatar-upload">
+                                    <div class="avatar-preview">田</div>
+                                    <div style="flex: 1;">
+                                        <button class="btn btn-outline btn-sm mb-sm">画像をアップロード</button>
+                                        <p class="help-text">推奨サイズ: 400x400px / 最大: 5MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">基本情報</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>氏名</label>
+                                        <input type="text" class="input" value="田中太郎" placeholder="氏名">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>ふりがな</label>
+                                        <input type="text" class="input" value="たなかたろう" placeholder="ふりがな">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>メールアドレス</label>
+                                    <input type="email" class="input" value="doctor@demo.medimatch.jp" placeholder="メールアドレス">
+                                    <p class="help-text">ログインとシステム通知に使用されます</p>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>電話番号</label>
+                                        <input type="tel" class="input" value="090-1234-5678" placeholder="090-1234-5678">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>生年月日</label>
+                                        <input type="date" class="input" value="1985-04-15">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">パスワード変更</h3>
+                                <div class="form-group">
+                                    <label>現在のパスワード</label>
+                                    <input type="password" class="input" placeholder="現在のパスワード">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>新しいパスワード</label>
+                                        <input type="password" class="input" placeholder="新しいパスワード">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>新しいパスワード（確認）</label>
+                                        <input type="password" class="input" placeholder="新しいパスワード（確認）">
+                                    </div>
+                                </div>
+                                <p class="help-text">パスワードは8文字以上で、英字・数字・記号を含める必要があります</p>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary">キャンセル</button>
+                                <button class="btn btn-primary" onclick="saveSettings('account')">変更を保存</button>
+                            </div>
+                        </div>
+                        
+                        <!-- プロフィール設定 -->
+                        <div id="profile-section" class="settings-section hidden">
+                            <div class="settings-section-header">
+                                <h2 class="settings-section-title">プロフィール設定</h2>
+                                <p class="settings-section-description">医師プロフィールの公開設定を管理します</p>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">公開設定</h3>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">匿名プロフィール</div>
+                                        <div class="settings-item-description">医療機関には匿名でプロフィールを表示します（マッチング後に実名開示）</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">スカウト受信</div>
+                                        <div class="settings-item-description">医療機関からのスカウトを受け取ります</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">プロフィールの公開</div>
+                                        <div class="settings-item-description">医療機関の検索結果にプロフィールを表示します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">ブロック設定</h3>
+                                <div class="form-group">
+                                    <label>ブロックする医療機関</label>
+                                    <p class="help-text mb-md">現在の勤務先など、プロフィールを表示したくない医療機関を設定できます</p>
+                                    <button class="btn btn-outline btn-sm">ブロックリストを管理</button>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary">キャンセル</button>
+                                <button class="btn btn-primary" onclick="saveSettings('profile')">変更を保存</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 通知設定 -->
+                        <div id="notifications-section" class="settings-section hidden">
+                            <div class="settings-section-header">
+                                <h2 class="settings-section-title">通知設定</h2>
+                                <p class="settings-section-description">各種通知の受信設定を管理します</p>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">メール通知</h3>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">新着スカウト通知</div>
+                                        <div class="settings-item-description">医療機関からスカウトを受け取った際に通知します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">応募結果通知</div>
+                                        <div class="settings-item-description">応募した求人の選考結果を通知します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">メッセージ通知</div>
+                                        <div class="settings-item-description">新しいメッセージを受信した際に通知します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">おすすめ求人通知</div>
+                                        <div class="settings-item-description">希望条件にマッチする新着求人を通知します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">プッシュ通知</h3>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">プッシュ通知を有効化</div>
+                                        <div class="settings-item-description">ブラウザのプッシュ通知を受け取ります</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">通知頻度</h3>
+                                <div class="form-group">
+                                    <label>メールの配信頻度</label>
+                                    <select class="select">
+                                        <option>即時（リアルタイム）</option>
+                                        <option selected>1日1回まとめて</option>
+                                        <option>週1回まとめて</option>
+                                    </select>
+                                    <p class="help-text">重要な通知は頻度設定に関わらず即時配信されます</p>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary">キャンセル</button>
+                                <button class="btn btn-primary" onclick="saveSettings('notifications')">変更を保存</button>
+                            </div>
+                        </div>
+                        
+                        <!-- プライバシー設定 -->
+                        <div id="privacy-section" class="settings-section hidden">
+                            <div class="settings-section-header">
+                                <h2 class="settings-section-title">プライバシー設定</h2>
+                                <p class="settings-section-description">情報の公開範囲と利用設定を管理します</p>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">データ利用設定</h3>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">サービス改善への協力</div>
+                                        <div class="settings-item-description">匿名化された利用データをサービス改善に活用します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">統計データへの協力</div>
+                                        <div class="settings-item-description">医療人材市場の統計データ作成に協力します（完全匿名化）</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">データのダウンロード</h3>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">アカウントデータのエクスポート</div>
+                                        <div class="settings-item-description">登録情報や活動履歴をダウンロードできます</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <button class="btn btn-outline btn-sm">データをダウンロード</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary">キャンセル</button>
+                                <button class="btn btn-primary" onclick="saveSettings('privacy')">変更を保存</button>
+                            </div>
+                        </div>
+                        
+                        <!-- セキュリティ設定 -->
+                        <div id="security-section" class="settings-section hidden">
+                            <div class="settings-section-header">
+                                <h2 class="settings-section-title">セキュリティ設定</h2>
+                                <p class="settings-section-description">アカウントのセキュリティを強化します</p>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">ログイン設定</h3>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">2段階認証</div>
+                                        <div class="settings-item-description">ログイン時に追加の認証を要求してセキュリティを強化します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <button class="btn btn-outline btn-sm">設定する</button>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">ログイン履歴</div>
+                                        <div class="settings-item-description">最近のログイン履歴を確認できます</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <button class="btn btn-outline btn-sm">履歴を見る</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title">セッション管理</h3>
+                                <div class="settings-item">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label">アクティブなセッション</div>
+                                        <div class="settings-item-description">現在ログイン中のデバイスを管理します</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <button class="btn btn-outline btn-sm">セッションを見る</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group danger-zone">
+                                <h3 class="settings-group-title" style="color: var(--error);">危険な操作</h3>
+                                <div class="settings-item" style="border: none;">
+                                    <div class="settings-item-info">
+                                        <div class="settings-item-label" style="color: var(--error);">アカウントの削除</div>
+                                        <div class="settings-item-description">アカウントを完全に削除します。この操作は取り消せません。</div>
+                                    </div>
+                                    <div class="settings-item-control">
+                                        <button class="btn btn-error btn-sm" onclick="confirmDeleteAccount()">アカウント削除</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary">キャンセル</button>
+                                <button class="btn btn-primary" onclick="saveSettings('security')">変更を保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認（デモでは無効化）
+        // if (!sessionStorage.getItem('isLoggedIn')) {
+        //     window.location.href = 'login.html';
+        // }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // セクション切り替え
+        function showSection(sectionId) {
+            // 全てのセクションを非表示
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // 選択されたセクションを表示
+            document.getElementById(sectionId + '-section').classList.remove('hidden');
+            
+            // ナビゲーションのアクティブ状態を更新
+            document.querySelectorAll('.settings-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.settings-nav-item').classList.add('active');
+        }
+        
+        // 設定保存
+        function saveSettings(section) {
+            const sectionNames = {
+                'account': 'アカウント',
+                'profile': 'プロフィール',
+                'notifications': '通知',
+                'privacy': 'プライバシー',
+                'security': 'セキュリティ'
+            };
+            
+            alert(`✅ ${sectionNames[section]}設定を保存しました。`);
+        }
+        
+        // アカウント削除確認
+        function confirmDeleteAccount() {
+            if (confirm('⚠️ アカウントを削除しますか？\n\nこの操作は取り消せません。全てのデータが完全に削除されます。')) {
+                if (confirm('本当に削除してもよろしいですか？\n\n確認のため、もう一度お聞きします。')) {
+                    alert('アカウント削除がリクエストされました。\n\n確認メールを送信しましたので、メール内のリンクから削除を完了してください。');
+                }
+            }
+        }
+        
+        // サインアウト
+        function signOut() {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>
