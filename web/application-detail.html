@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>応募詳細 - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-xl);
+        }
+        
+        .detail-main {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .detail-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .doctor-header-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+        }
+        
+        .doctor-header-content {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: center;
+        }
+        
+        .doctor-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: var(--border-radius-lg);
+            background-color: white;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 700;
+            flex-shrink: 0;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .doctor-header-info {
+            flex: 1;
+        }
+        
+        .doctor-name-large {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .doctor-specialty-large {
+            font-size: var(--font-size-lg);
+            opacity: 0.95;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .doctor-meta-row {
+            display: flex;
+            gap: var(--spacing-lg);
+        }
+        
+        .detail-section {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .detail-section-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .job-info-card {
+            background-color: var(--gray-50);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .job-info-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-blue);
+        }
+        
+        .job-info-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        
+        .application-message-box {
+            background-color: var(--gray-50);
+            border-left: 4px solid var(--primary-blue);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            line-height: 1.8;
+        }
+        
+        .info-row {
+            display: flex;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            width: 150px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: var(--text-primary);
+        }
+        
+        .status-change-section {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .status-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+        }
+        
+        .status-btn {
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .status-btn:hover {
+            border-color: var(--primary-blue);
+            background-color: var(--primary-blue-light);
+        }
+        
+        .status-btn.active {
+            border-color: var(--primary-blue);
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .status-btn.success {
+            border-color: var(--success);
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .status-btn.error {
+            border-color: var(--error);
+            background-color: var(--error-light);
+            color: var(--error);
+        }
+        
+        .action-card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .action-card-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: var(--spacing-xl);
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background-color: var(--border-color);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: var(--spacing-lg);
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -28px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--primary-blue);
+        }
+        
+        .timeline-dot.gray {
+            background-color: var(--gray-400);
+            box-shadow: 0 0 0 2px var(--gray-400);
+        }
+        
+        .timeline-content {
+            background-color: var(--gray-50);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+        }
+        
+        .timeline-date {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .timeline-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+        }
+        
+        @media (max-width: 1024px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .doctor-header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .status-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                    <span class="badge badge-error" style="margin-left: auto;">12</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">応募詳細</h1>
+                </div>
+                
+                <div class="header-right">
+                    <button class="btn btn-outline btn-sm" onclick="history.back()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        戻る
+                    </button>
+                    
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="breadcrumb mb-lg">
+                    <a href="dashboard.html">ホーム</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <a href="applications.html">応募管理</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>応募詳細</span>
+                </div>
+                
+                <div class="detail-container">
+                    <!-- 医師ヘッダー -->
+                    <div class="doctor-header-card">
+                        <div class="doctor-header-content">
+                            <div class="doctor-avatar-large" id="doctorAvatar">佐</div>
+                            <div class="doctor-header-info">
+                                <div class="doctor-name-large" id="doctorName">佐藤健一</div>
+                                <div class="doctor-specialty-large" id="doctorSpecialty">内科 / 消化器内科</div>
+                                <div class="doctor-meta-row">
+                                    <span id="doctorExperience">経験15年</span>
+                                    <span>•</span>
+                                    <span id="doctorAge">38歳</span>
+                                    <span>•</span>
+                                    <span id="doctorLocation">東京都</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-grid mt-xl">
+                        <!-- メインコンテンツ -->
+                        <div class="detail-main">
+                            <!-- 応募求人情報 -->
+                            <div class="detail-section">
+                                <h2 class="detail-section-title">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                    </svg>
+                                    応募求人
+                                </h2>
+                                <div class="job-info-card">
+                                    <div class="job-info-title" id="jobTitle">消化器内科医師（常勤）</div>
+                                    <div class="job-info-meta">
+                                        <span id="jobSpecialty">内科</span>
+                                        <span>•</span>
+                                        <span id="jobEmploymentType">常勤</span>
+                                        <span>•</span>
+                                        <span id="jobLocation">東京都港区</span>
+                                        <span>•</span>
+                                        <span id="jobSalary">年収 1,200万円〜</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline" onclick="viewJobDetail()">
+                                    求人詳細を見る
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <!-- 応募メッセージ -->
+                            <div class="detail-section">
+                                <h2 class="detail-section-title">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    応募メッセージ
+                                </h2>
+                                <div class="application-message-box" id="applicationMessage">
+                                    消化器内科医師（常勤）のポジションに応募させていただきます。15年の経験を活かし、貴院の医療サービス向上に貢献したいと考えております。ぜひ一度お話しする機会をいただけますと幸いです。よろしくお願いいたします。
+                                </div>
+                            </div>
+                            
+                            <!-- 応募情報 -->
+                            <div class="detail-section">
+                                <h2 class="detail-section-title">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    応募情報
+                                </h2>
+                                <div class="info-row">
+                                    <div class="info-label">応募日時</div>
+                                    <div class="info-value" id="appliedDate">2026年1月10日 14:30</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">現在のステータス</div>
+                                    <div class="info-value">
+                                        <span class="badge badge-warning" id="currentStatus">新着</span>
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">希望面接日</div>
+                                    <div class="info-value">平日 14:00以降</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">入職可能日</div>
+                                    <div class="info-value">2026年4月1日〜</div>
+                                </div>
+                            </div>
+                            
+                            <!-- 選考タイムライン -->
+                            <div class="detail-section">
+                                <h2 class="detail-section-title">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="2" x2="12" y2="22"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                    選考タイムライン
+                                </h2>
+                                <div class="timeline" id="timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-date">2026年1月10日 14:30</div>
+                                            <div class="timeline-text">応募を受け付けました</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- サイドバー -->
+                        <div class="detail-sidebar">
+                            <!-- ステータス変更 -->
+                            <div class="status-change-section">
+                                <h3 class="detail-section-title">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                    ステータス変更
+                                </h3>
+                                <div class="status-buttons">
+                                    <button class="status-btn" onclick="changeStatus('screening')">
+                                        📋 書類選考中
+                                    </button>
+                                    <button class="status-btn" onclick="changeStatus('interview')">
+                                        📅 面接調整中
+                                    </button>
+                                    <button class="status-btn success" onclick="changeStatus('offer')">
+                                        ✅ 内定
+                                    </button>
+                                    <button class="status-btn error" onclick="changeStatus('rejected')">
+                                        ❌ 不採用
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- アクション -->
+                            <div class="action-card">
+                                <h3 class="action-card-title">アクション</h3>
+                                <div class="d-flex flex-column gap-sm">
+                                    <button class="btn btn-primary" onclick="sendMessage()">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        メッセージを送る
+                                    </button>
+                                    <button class="btn btn-outline" onclick="viewDoctorProfile()">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        詳細プロフィール
+                                    </button>
+                                    <button class="btn btn-outline" onclick="scheduleInterview()">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        面接日程調整
+                                    </button>
+                                    <button class="btn btn-outline" onclick="downloadResume()">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        履歴書ダウンロード
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // デモデータ
+        const doctor = DEMO_DOCTORS[0];
+        const job = DEMO_JOBS[0];
+        let currentStatus = 'new';
+        
+        const statusMap = {
+            'new': { label: '新着', class: 'warning' },
+            'screening': { label: '書類選考中', class: 'info' },
+            'interview': { label: '面接調整中', class: 'primary' },
+            'offer': { label: '内定', class: 'success' },
+            'rejected': { label: '不採用', class: 'gray' }
+        };
+        
+        // タイムラインイベント
+        const timelineEvents = [
+            { date: '2026年1月10日 14:30', text: '応募を受け付けました', active: true }
+        ];
+        
+        // 医師情報を表示
+        function displayDoctorInfo() {
+            document.getElementById('doctorAvatar').textContent = doctor.name.substring(0, 1);
+            document.getElementById('doctorName').textContent = doctor.name;
+            document.getElementById('doctorSpecialty').textContent = `${doctor.specialty} / ${doctor.subSpecialty}`;
+            document.getElementById('doctorExperience').textContent = `経験${doctor.experience}年`;
+            document.getElementById('doctorAge').textContent = `${doctor.age}歳`;
+            document.getElementById('doctorLocation').textContent = doctor.preferredLocations[0];
+        }
+        
+        // 求人情報を表示
+        function displayJobInfo() {
+            document.getElementById('jobTitle').textContent = job.title;
+            document.getElementById('jobSpecialty').textContent = job.specialty;
+            document.getElementById('jobEmploymentType').textContent = job.employmentType;
+            document.getElementById('jobLocation').textContent = job.location;
+            document.getElementById('jobSalary').textContent = formatSalary(job);
+        }
+        
+        // タイムライン表示
+        function displayTimeline() {
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+            
+            timelineEvents.forEach((event, index) => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                item.innerHTML = `
+                    <div class="timeline-dot ${event.active ? '' : 'gray'}"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">${event.date}</div>
+                        <div class="timeline-text">${event.text}</div>
+                    </div>
+                `;
+                timeline.appendChild(item);
+            });
+        }
+        
+        // ステータス変更
+        function changeStatus(newStatus) {
+            if (newStatus === currentStatus) return;
+            
+            const statusInfo = statusMap[newStatus];
+            if (confirm(`ステータスを「${statusInfo.label}」に変更しますか？`)) {
+                currentStatus = newStatus;
+                
+                // バッジを更新
+                const badge = document.getElementById('currentStatus');
+                badge.className = `badge badge-${statusInfo.class}`;
+                badge.textContent = statusInfo.label;
+                
+                // タイムラインに追加
+                const now = new Date();
+                const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+                timelineEvents.unshift({
+                    date: dateStr,
+                    text: `ステータスを「${statusInfo.label}」に変更しました`,
+                    active: true
+                });
+                
+                displayTimeline();
+                alert(`✅ ステータスを「${statusInfo.label}」に変更しました。`);
+            }
+        }
+        
+        // メッセージ送信
+        function sendMessage() {
+            alert(`💬 ${doctor.name}さんへのメッセージ画面を開きます。\n\n（メッセージ機能は別途実装予定）`);
+        }
+        
+        // 医師プロフィール表示
+        function viewDoctorProfile() {
+            window.location.href = 'doctor-detail.html';
+        }
+        
+        // 面接日程調整
+        function scheduleInterview() {
+            alert('📅 面接日程調整画面を開きます。\n\n候補日を提案して医師と調整できます。');
+        }
+        
+        // 履歴書ダウンロード
+        function downloadResume() {
+            alert('📄 履歴書をダウンロードします。\n\n（デモのため実際のダウンロードは行われません）');
+        }
+        
+        // 求人詳細表示
+        function viewJobDetail() {
+            alert('求人詳細画面へ遷移します。');
+        }
+        
+        // 初期化
+        displayDoctorInfo();
+        displayJobInfo();
+        displayTimeline();
+    </script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ダッシュボード - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav" role="navigation" aria-label="メインナビゲーション">
+                <a href="dashboard.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m5.196-14.196l-4.242 4.242m0 5.656l-4.242 4.242m9.9-9.9l-4.243 4.243m0 5.656l-4.242 4.242M23 12h-6M7 12H1m16.196 5.196l-4.242-4.242m0-5.656L8.712 3.056M7.804 16.196l4.242-4.242m0-5.656l4.242-4.242"></path>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle" aria-label="メニューを開閉">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">ダッシュボード</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="notification-icon" role="button" aria-label="通知" tabindex="0">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button" role="button" aria-label="ユーザーメニュー" tabindex="0">
+                            <div class="user-avatar" aria-hidden="true">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        
+                        <!-- ドロップダウンメニュー -->
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name" id="dropdownUserName">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <!-- 統計カード -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-label">公開中の求人</div>
+                                <div class="stat-value">8</div>
+                                <div class="stat-change positive">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="18 15 12 9 6 15"></polyline>
+                                    </svg>
+                                    先月比 +2件
+                                </div>
+                            </div>
+                            <div class="stat-icon blue">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-label">今月の新着応募</div>
+                                <div class="stat-value">23</div>
+                                <div class="stat-change positive">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="18 15 12 9 6 15"></polyline>
+                                    </svg>
+                                    先月比 +35%
+                                </div>
+                            </div>
+                            <div class="stat-icon green">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <path d="M20 8v6M23 11h-6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-label">選考中の候補者</div>
+                                <div class="stat-value">12</div>
+                                <div class="stat-change">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    先月と同じ
+                                </div>
+                            </div>
+                            <div class="stat-icon orange">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-label">今月のマッチング成立</div>
+                                <div class="stat-value">5</div>
+                                <div class="stat-change positive">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="18 15 12 9 6 15"></polyline>
+                                    </svg>
+                                    先月比 +67%
+                                </div>
+                            </div>
+                            <div class="stat-icon green">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 最近の応募 -->
+                <div class="card mb-xl">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">最近の応募</h2>
+                            <a href="applications.html" class="btn btn-sm btn-outline">すべて見る</a>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>医師名</th>
+                                    <th>診療科</th>
+                                    <th>応募求人</th>
+                                    <th>応募日</th>
+                                    <th>ステータス</th>
+                                    <th>アクション</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentApplications">
+                                <!-- JavaScriptで動的に生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 公開中の求人 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">公開中の求人</h2>
+                            <a href="job-create.html" class="btn btn-sm btn-primary">新規求人作成</a>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>求人タイトル</th>
+                                    <th>診療科</th>
+                                    <th>雇用形態</th>
+                                    <th>閲覧数</th>
+                                    <th>応募数</th>
+                                    <th>ステータス</th>
+                                    <th>アクション</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeJobs">
+                                <!-- JavaScriptで動的に生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // ユーザー名表示
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // 最近の応募を表示（最新5件）
+        function displayRecentApplications() {
+            const tbody = document.getElementById('recentApplications');
+            const recentDoctors = DEMO_DOCTORS.slice(0, 5);
+            const statuses = ['書類選考中', '面接調整中', '面接済み', '書類選考中', '書類選考中'];
+            
+            recentDoctors.forEach((doctor, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="fw-medium">${doctor.name}</div>
+                        <div class="text-muted" style="font-size: var(--font-size-sm);">${doctor.experience}年経験</div>
+                    </td>
+                    <td>${doctor.specialty}</td>
+                    <td>${DEMO_JOBS[index].title}</td>
+                    <td>${formatDate(DEMO_JOBS[index].postedDate)}</td>
+                    <td><span class="badge badge-info">${statuses[index]}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline">詳細を見る</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // 公開中の求人を表示
+        function displayActiveJobs() {
+            const tbody = document.getElementById('activeJobs');
+            const activeJobs = DEMO_JOBS.filter(job => job.status === 'published').slice(0, 5);
+            
+            activeJobs.forEach(job => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="fw-medium">${job.title}</div>
+                        <div class="text-muted" style="font-size: var(--font-size-sm);">${job.location}</div>
+                    </td>
+                    <td>${job.specialty}</td>
+                    <td><span class="badge badge-gray">${job.employmentType}</span></td>
+                    <td>${job.views}</td>
+                    <td class="fw-semibold text-primary">${job.applications}</td>
+                    <td><span class="badge badge-success">公開中</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline">編集</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // 初期化
+        displayRecentApplications();
+        displayActiveJobs();
+    </script>
+</body>
+</html>

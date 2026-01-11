@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>希望条件設定 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .preference-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .preference-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .preference-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .preference-title {
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .range-slider-container {
+            margin-top: var(--spacing-md);
+        }
+        
+        .range-slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xs);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .range-slider-value {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--gray-200);
+            outline: none;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            border: none;
+        }
+        
+        .dual-range-container {
+            position: relative;
+            height: 40px;
+        }
+        
+        .dual-range-track {
+            position: absolute;
+            top: 17px;
+            width: 100%;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+        }
+        
+        .dual-range-fill {
+            position: absolute;
+            height: 6px;
+            background: var(--primary-blue);
+            border-radius: 3px;
+        }
+        
+        .dual-range-slider {
+            position: absolute;
+            width: 100%;
+            pointer-events: none;
+        }
+        
+        .dual-range-slider input {
+            pointer-events: all;
+        }
+        
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+        }
+        
+        .location-checkbox {
+            display: none;
+        }
+        
+        .location-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-sm);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: var(--font-size-sm);
+        }
+        
+        .location-checkbox:checked + .location-label {
+            background: var(--light-blue-bg);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .priority-slider {
+            margin: var(--spacing-md) 0;
+        }
+        
+        .priority-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .condition-summary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-xl);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .condition-summary-title {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .condition-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+        
+        .condition-summary-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .condition-summary-label {
+            font-size: var(--font-size-xs);
+            opacity: 0.8;
+        }
+        
+        .condition-summary-value {
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+        }
+        
+        .match-score {
+            background: var(--bg-white);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+        
+        .match-score-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .match-score-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">希望条件設定</h1>
+            <button class="header-action-btn" onclick="resetPreferences()" aria-label="リセット">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content" style="padding-bottom: 100px;">
+            <!-- 条件サマリー -->
+            <div class="condition-summary">
+                <div class="condition-summary-title">現在の希望条件</div>
+                <div class="condition-summary-grid">
+                    <div class="condition-summary-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <div>
+                            <div class="condition-summary-label">勤務地</div>
+                            <div class="condition-summary-value" id="summaryLocation">東京都</div>
+                        </div>
+                    </div>
+                    <div class="condition-summary-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <div>
+                            <div class="condition-summary-label">希望年収</div>
+                            <div class="condition-summary-value" id="summarySalary">1200万円</div>
+                        </div>
+                    </div>
+                    <div class="condition-summary-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                        <div>
+                            <div class="condition-summary-label">勤務形態</div>
+                            <div class="condition-summary-value" id="summaryType">常勤</div>
+                        </div>
+                    </div>
+                    <div class="condition-summary-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <div>
+                            <div class="condition-summary-label">勤務時間</div>
+                            <div class="condition-summary-value" id="summaryHours">週40時間</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- マッチスコア -->
+            <div class="match-score">
+                <div class="match-score-value">87%</div>
+                <div class="match-score-label">この条件に合う求人が<strong>23件</strong>見つかりました</div>
+                <button class="btn btn-primary mt-md" onclick="searchMatchingJobs()">
+                    マッチする求人を見る
+                </button>
+            </div>
+            
+            <!-- 勤務地 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">勤務地</h2>
+                </div>
+                
+                <div class="preference-card">
+                    <div class="preference-header">
+                        <div class="preference-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="preference-title">希望勤務地</div>
+                    </div>
+                    
+                    <div class="location-grid">
+                        <div>
+                            <input type="checkbox" id="loc-tokyo" class="location-checkbox" checked>
+                            <label for="loc-tokyo" class="location-label">東京都</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="loc-kanagawa" class="location-checkbox" checked>
+                            <label for="loc-kanagawa" class="location-label">神奈川県</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="loc-chiba" class="location-checkbox">
+                            <label for="loc-chiba" class="location-label">千葉県</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="loc-saitama" class="location-checkbox">
+                            <label for="loc-saitama" class="location-label">埼玉県</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="loc-osaka" class="location-checkbox">
+                            <label for="loc-osaka" class="location-label">大阪府</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="loc-other" class="location-checkbox">
+                            <label for="loc-other" class="location-label">その他</label>
+                        </div>
+                    </div>
+                    
+                    <div class="range-slider-container">
+                        <div class="range-slider-label">
+                            <span>通勤時間（最大）</span>
+                            <span class="range-slider-value" id="commuteTimeValue">60分</span>
+                        </div>
+                        <input type="range" class="range-slider" min="15" max="120" value="60" step="15" 
+                               oninput="updateCommuteTime(this.value)">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 給与条件 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">給与条件</h2>
+                </div>
+                
+                <div class="preference-card">
+                    <div class="preference-header">
+                        <div class="preference-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <div class="preference-title">希望年収</div>
+                    </div>
+                    
+                    <div class="range-slider-container">
+                        <div class="range-slider-label">
+                            <span>最低年収</span>
+                            <span class="range-slider-value" id="salaryValue">1200万円</span>
+                        </div>
+                        <input type="range" class="range-slider" min="600" max="3000" value="1200" step="100" 
+                               oninput="updateSalary(this.value)">
+                    </div>
+                    
+                    <div class="form-group mt-md">
+                        <label class="form-label">給与形態</label>
+                        <select class="form-control">
+                            <option>年俸制</option>
+                            <option>月給制</option>
+                            <option>時給制</option>
+                            <option>日給制</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item mt-md">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">インセンティブ重視</div>
+                            <div class="setting-item-subtitle">成果報酬型の給与を優先</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 勤務形態 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">勤務形態</h2>
+                </div>
+                
+                <div class="preference-card">
+                    <div class="preference-header">
+                        <div class="preference-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <div class="preference-title">希望する勤務形態</div>
+                    </div>
+                    
+                    <div class="chip-group">
+                        <button class="chip active" onclick="toggleChip(this)">常勤</button>
+                        <button class="chip" onclick="toggleChip(this)">非常勤</button>
+                        <button class="chip" onclick="toggleChip(this)">スポット</button>
+                        <button class="chip" onclick="toggleChip(this)">定期非常勤</button>
+                    </div>
+                    
+                    <div class="range-slider-container">
+                        <div class="range-slider-label">
+                            <span>週の勤務時間</span>
+                            <span class="range-slider-value" id="workHoursValue">40時間</span>
+                        </div>
+                        <input type="range" class="range-slider" min="8" max="60" value="40" step="4" 
+                               oninput="updateWorkHours(this.value)">
+                    </div>
+                    
+                    <div class="setting-item mt-md">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">当直あり</div>
+                            <div class="setting-item-subtitle">当直勤務を含む求人も検討</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">オンコールあり</div>
+                            <div class="setting-item-subtitle">オンコール対応を含む求人も検討</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 診療科・専門性 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">診療科・専門性</h2>
+                </div>
+                
+                <div class="preference-card">
+                    <div class="preference-header">
+                        <div class="preference-icon" style="background: var(--info-light); color: var(--info);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                        </div>
+                        <div class="preference-title">希望診療科</div>
+                    </div>
+                    
+                    <div class="chip-group">
+                        <button class="chip active" onclick="toggleChip(this)">内科</button>
+                        <button class="chip active" onclick="toggleChip(this)">消化器内科</button>
+                        <button class="chip" onclick="toggleChip(this)">循環器内科</button>
+                        <button class="chip" onclick="toggleChip(this)">呼吸器内科</button>
+                        <button class="chip" onclick="toggleChip(this)">総合診療科</button>
+                        <button class="chip" onclick="toggleChip(this)">救急科</button>
+                    </div>
+                    
+                    <div class="form-group mt-md">
+                        <label class="form-label">専門外の診療</label>
+                        <select class="form-control">
+                            <option>専門のみ</option>
+                            <option>関連診療科も可</option>
+                            <option>幅広く対応可能</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 施設タイプ -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">施設タイプ</h2>
+                </div>
+                
+                <div class="preference-card">
+                    <div class="preference-header">
+                        <div class="preference-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </div>
+                        <div class="preference-title">希望する施設</div>
+                    </div>
+                    
+                    <div class="chip-group">
+                        <button class="chip active" onclick="toggleChip(this)">総合病院</button>
+                        <button class="chip active" onclick="toggleChip(this)">クリニック</button>
+                        <button class="chip" onclick="toggleChip(this)">大学病院</button>
+                        <button class="chip" onclick="toggleChip(this)">介護施設</button>
+                        <button class="chip" onclick="toggleChip(this)">健診センター</button>
+                        <button class="chip" onclick="toggleChip(this)">在宅医療</button>
+                    </div>
+                    
+                    <div class="range-slider-container">
+                        <div class="range-slider-label">
+                            <span>病床数（病院の場合）</span>
+                            <span class="range-slider-value" id="bedsValue">200床以上</span>
+                        </div>
+                        <input type="range" class="range-slider" min="0" max="1000" value="200" step="50" 
+                               oninput="updateBeds(this.value)">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 条件の優先度 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">条件の優先度</h2>
+                </div>
+                
+                <div class="preference-card">
+                    <div class="preference-header">
+                        <div class="preference-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        </div>
+                        <div class="preference-title">最も重視する条件</div>
+                    </div>
+                    
+                    <div class="priority-slider">
+                        <div class="form-group">
+                            <label class="form-label">給与</label>
+                            <input type="range" class="range-slider" min="1" max="5" value="5" step="1">
+                            <div class="priority-labels">
+                                <span>低</span>
+                                <span>高</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">勤務地</label>
+                            <input type="range" class="range-slider" min="1" max="5" value="4" step="1">
+                            <div class="priority-labels">
+                                <span>低</span>
+                                <span>高</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">勤務時間</label>
+                            <input type="range" class="range-slider" min="1" max="5" value="3" step="1">
+                            <div class="priority-labels">
+                                <span>低</span>
+                                <span>高</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">施設規模</label>
+                            <input type="range" class="range-slider" min="1" max="5" value="3" step="1">
+                            <div class="priority-labels">
+                                <span>低</span>
+                                <span>高</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">キャリアアップ</label>
+                            <input type="range" class="range-slider" min="1" max="5" value="2" step="1">
+                            <div class="priority-labels">
+                                <span>低</span>
+                                <span>高</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- その他条件 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">その他条件</h2>
+                </div>
+                
+                <div class="preference-card">
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">駅近（徒歩10分以内）</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">車通勤可</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">住宅手当・社宅あり</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">研修制度充実</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">即日勤務開始可能</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 保存ボタン -->
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; padding: var(--spacing-md); background: var(--bg-white); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); z-index: 100;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="savePreferences()">
+                保存する
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // 通勤時間更新
+        function updateCommuteTime(value) {
+            document.getElementById('commuteTimeValue').textContent = value + '分';
+        }
+        
+        // 年収更新
+        function updateSalary(value) {
+            document.getElementById('salaryValue').textContent = value + '万円';
+            document.getElementById('summarySalary').textContent = value + '万円';
+        }
+        
+        // 勤務時間更新
+        function updateWorkHours(value) {
+            document.getElementById('workHoursValue').textContent = value + '時間';
+            document.getElementById('summaryHours').textContent = '週' + value + '時間';
+        }
+        
+        // 病床数更新
+        function updateBeds(value) {
+            const text = value === '0' ? '指定なし' : value + '床以上';
+            document.getElementById('bedsValue').textContent = text;
+        }
+        
+        // チップ切り替え
+        function toggleChip(element) {
+            element.classList.toggle('active');
+        }
+        
+        // マッチする求人を検索
+        function searchMatchingJobs() {
+            alert('条件に合う求人を検索します');
+            // location.href = 'job-search.html';
+        }
+        
+        // 設定保存
+        function savePreferences() {
+            alert('希望条件を保存しました');
+            history.back();
+        }
+        
+        // リセット
+        function resetPreferences() {
+            if (confirm('すべての希望条件をリセットしますか？')) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

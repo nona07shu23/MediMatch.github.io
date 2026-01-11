@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>空き時間登録 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .info-banner {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-lg) var(--spacing-md);
+            margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-md);
+        }
+        
+        .info-banner-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .info-banner-text {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .date-picker-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+        
+        .time-picker-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+        
+        .repeat-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .repeat-option {
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .repeat-option.selected {
+            border-color: var(--primary-blue);
+            background: var(--very-light-blue);
+        }
+        
+        .weekday-selector {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .weekday-btn {
+            aspect-ratio: 1;
+            border: 2px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: 50%;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .weekday-btn.selected {
+            border-color: var(--primary-blue);
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .price-input-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .price-input-group input {
+            flex: 1;
+            text-align: right;
+            font-size: var(--font-size-lg);
+        }
+        
+        .suggestion-chips {
+            display: flex;
+            gap: var(--spacing-xs);
+            flex-wrap: wrap;
+            margin-top: var(--spacing-sm);
+        }
+        
+        .suggestion-chip {
+            padding: var(--spacing-xs) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: 16px;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .suggestion-chip:active {
+            background: var(--gray-100);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                キャンセル
+            </button>
+            <h1 class="header-title">空き時間登録</h1>
+            <button class="header-action-btn" onclick="saveAvailableTime()">
+                <span style="color: var(--primary-blue); font-weight: 600;">登録</span>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content" style="padding-bottom: 100px;">
+            <!-- 情報バナー -->
+            <div class="info-banner">
+                <div class="info-banner-title">💡 空き時間逆指名とは？</div>
+                <div class="info-banner-text">
+                    あなたの空いている時間を登録すると、条件に合う医療機関から自動的にオファーが届きます
+                </div>
+            </div>
+            
+            <!-- 日時設定 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">日時設定</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">募集日 <span class="text-error">*</span></label>
+                    <div class="date-picker-group">
+                        <input type="date" class="form-control" value="2026-01-20" style="flex: 1;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">時間帯 <span class="text-error">*</span></label>
+                    <div class="time-picker-group">
+                        <input type="time" class="form-control" value="09:00">
+                        <span>〜</span>
+                        <input type="time" class="form-control" value="17:00">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">繰り返し</label>
+                    <div class="repeat-options">
+                        <div class="repeat-option selected" onclick="selectRepeat(this, 'once')">
+                            <div style="font-weight: 600;">単発</div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: 4px;">この日のみ</div>
+                        </div>
+                        <div class="repeat-option" onclick="selectRepeat(this, 'weekly')">
+                            <div style="font-weight: 600;">毎週</div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: 4px;">定期勤務</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="weekdaySelector" style="display: none;">
+                    <label class="form-label">曜日選択</label>
+                    <div class="weekday-selector">
+                        <button class="weekday-btn" onclick="toggleWeekday(this)">日</button>
+                        <button class="weekday-btn" onclick="toggleWeekday(this)">月</button>
+                        <button class="weekday-btn" onclick="toggleWeekday(this)">火</button>
+                        <button class="weekday-btn selected" onclick="toggleWeekday(this)">水</button>
+                        <button class="weekday-btn" onclick="toggleWeekday(this)">木</button>
+                        <button class="weekday-btn" onclick="toggleWeekday(this)">金</button>
+                        <button class="weekday-btn" onclick="toggleWeekday(this)">土</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 希望条件 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">希望条件</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">希望診療科 <span class="text-error">*</span></label>
+                    <select class="form-control">
+                        <option>選択してください</option>
+                        <option selected>内科</option>
+                        <option>外科</option>
+                        <option>整形外科</option>
+                        <option>小児科</option>
+                        <option>産婦人科</option>
+                        <option>その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">希望地域 <span class="text-error">*</span></label>
+                    <select class="form-control">
+                        <option>選択してください</option>
+                        <option selected>東京都</option>
+                        <option>神奈川県</option>
+                        <option>千葉県</option>
+                        <option>埼玉県</option>
+                        <option>その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">希望時給 <span class="text-error">*</span></label>
+                    <div class="price-input-group">
+                        <span class="text-muted">時給</span>
+                        <input type="number" class="form-control" value="12000" step="1000">
+                        <span class="text-muted">円</span>
+                    </div>
+                    <div class="suggestion-chips">
+                        <button class="suggestion-chip" onclick="setSuggestedPrice(10000)">10,000円</button>
+                        <button class="suggestion-chip" onclick="setSuggestedPrice(12000)">12,000円</button>
+                        <button class="suggestion-chip" onclick="setSuggestedPrice(15000)">15,000円</button>
+                        <button class="suggestion-chip" onclick="setSuggestedPrice(20000)">20,000円</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">当直</label>
+                    <select class="form-control">
+                        <option selected>なし</option>
+                        <option>あり（別途相談）</option>
+                        <option>どちらでも可</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 詳細条件 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">詳細条件（任意）</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">施設タイプ</label>
+                    <div class="chip-group" style="display: flex; flex-wrap: wrap; gap: var(--spacing-xs);">
+                        <button class="chip active" onclick="this.classList.toggle('active')" style="padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--border-color); background: var(--primary-blue); color: white; border-radius: 16px; font-size: var(--font-size-sm);">病院</button>
+                        <button class="chip active" onclick="this.classList.toggle('active')" style="padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--border-color); background: var(--primary-blue); color: white; border-radius: 16px; font-size: var(--font-size-sm);">クリニック</button>
+                        <button class="chip" onclick="this.classList.toggle('active')" style="padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--border-color); background: var(--bg-white); color: var(--text-primary); border-radius: 16px; font-size: var(--font-size-sm);">訪問診療</button>
+                        <button class="chip" onclick="this.classList.toggle('active')" style="padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--border-color); background: var(--bg-white); color: var(--text-primary); border-radius: 16px; font-size: var(--font-size-sm);">健診センター</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">備考・特記事項</label>
+                    <textarea class="form-control" rows="4" placeholder="例: 内視鏡検査の経験が豊富です。駅から徒歩圏内を希望します。"></textarea>
+                </div>
+            </div>
+            
+            <!-- 自動マッチング設定 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">自動マッチング</h2>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="fw-medium">自動マッチングを有効化</div>
+                        <div class="text-muted" style="font-size: var(--font-size-sm); margin-top: 4px;">
+                            条件に合う施設から自動的にオファーを受け取ります
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')" style="position: relative; width: 50px; height: 28px; background: var(--primary-blue); border-radius: 14px; cursor: pointer; transition: background var(--transition-base);">
+                        <div style="position: absolute; width: 24px; height: 24px; background: white; border-radius: 50%; top: 2px; left: 24px; transition: transform var(--transition-base); box-shadow: var(--shadow-sm);"></div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-md">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    オファーが届いたら通知でお知らせします。気に入ったオファーにのみ返信できます。
+                </div>
+            </div>
+        </main>
+        
+        <!-- 登録ボタン -->
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; padding: var(--spacing-md); background: var(--bg-white); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); z-index: 100;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="saveAvailableTime()">
+                空き時間を登録する
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // 繰り返し選択
+        function selectRepeat(element, type) {
+            document.querySelectorAll('.repeat-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            // 曜日選択の表示/非表示
+            document.getElementById('weekdaySelector').style.display = 
+                type === 'weekly' ? 'block' : 'none';
+        }
+        
+        // 曜日選択
+        function toggleWeekday(button) {
+            button.classList.toggle('selected');
+        }
+        
+        // 推奨価格設定
+        function setSuggestedPrice(price) {
+            document.querySelector('.price-input-group input').value = price;
+        }
+        
+        // 空き時間登録
+        function saveAvailableTime() {
+            if (confirm('この内容で空き時間を登録しますか？\n\n条件に合う医療機関から自動的にオファーが届きます。')) {
+                alert('空き時間を登録しました！\n\nオファーが届いたら通知でお知らせします。');
+                location.href = 'calendar.html';
+            }
+        }
+    </script>
+</body>
+</html>

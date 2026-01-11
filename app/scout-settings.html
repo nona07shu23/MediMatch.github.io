@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>スカウト設定 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-label {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .setting-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: var(--gray-300);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background var(--transition-base);
+        }
+        
+        .toggle-switch.active {
+            background: var(--primary-blue);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(22px);
+        }
+        
+        .salary-input-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .salary-input-group input {
+            flex: 1;
+            text-align: right;
+        }
+        
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .chip {
+            padding: var(--spacing-xs) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--bg-white);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: var(--font-size-sm);
+        }
+        
+        .chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .time-range {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .time-range input {
+            flex: 1;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">スカウト設定</h1>
+            <div style="width: 24px;"></div>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content" style="padding-bottom: 100px;">
+            <!-- アラートバナー -->
+            <div class="mobile-card" style="background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); color: white;">
+                <div class="d-flex" style="gap: var(--spacing-md); align-items: center;">
+                    <div style="font-size: 32px;">📬</div>
+                    <div style="flex: 1;">
+                        <div class="fw-semibold mb-xs">スカウトを受け取ろう</div>
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9;">
+                            設定を最適化すると、あなたに合ったスカウトが届きやすくなります
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 通知設定 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">通知設定</h2>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">プッシュ通知</div>
+                        <div class="setting-description">新しいスカウトが届いたときに通知します</div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">メール通知</div>
+                        <div class="setting-description">重要なスカウトをメールでお知らせします</div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">通知時間帯</div>
+                        <div class="setting-description">通知を受け取る時間帯を設定できます</div>
+                        <div class="time-range">
+                            <input type="time" class="form-control" value="08:00">
+                            <span>〜</span>
+                            <input type="time" class="form-control" value="22:00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- スカウト受信条件 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">スカウト受信条件</h2>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info" style="width: 100%;">
+                        <div class="setting-label">最低希望時給</div>
+                        <div class="setting-description">この金額以上のスカウトのみ受け取ります</div>
+                        <div class="salary-input-group">
+                            <span class="text-muted">時給</span>
+                            <input type="number" class="form-control" value="10000" step="1000">
+                            <span class="text-muted">円以上</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info" style="width: 100%;">
+                        <div class="setting-label">勤務形態</div>
+                        <div class="setting-description">興味のある勤務形態を選択してください</div>
+                        <div class="chip-group">
+                            <button class="chip active" onclick="this.classList.toggle('active')">常勤（正社員）</button>
+                            <button class="chip active" onclick="this.classList.toggle('active')">非常勤（定期アルバイト）</button>
+                            <button class="chip active" onclick="this.classList.toggle('active')">スポット（単発）</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info" style="width: 100%;">
+                        <div class="setting-label">希望勤務地</div>
+                        <div class="setting-description">スカウトを受け取りたい地域を選択</div>
+                        <div class="chip-group">
+                            <button class="chip active" onclick="this.classList.toggle('active')">東京都</button>
+                            <button class="chip active" onclick="this.classList.toggle('active')">神奈川県</button>
+                            <button class="chip" onclick="this.classList.toggle('active')">千葉県</button>
+                            <button class="chip" onclick="this.classList.toggle('active')">埼玉県</button>
+                            <button class="chip" onclick="this.classList.toggle('active')">大阪府</button>
+                            <button class="chip" onclick="this.classList.toggle('active')">愛知県</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">当直の可否</div>
+                        <div class="setting-description">当直があるスカウトも受け取りますか？</div>
+                    </div>
+                    <select class="form-control" style="width: auto;">
+                        <option>当直なし希望</option>
+                        <option>当直可能</option>
+                        <option>どちらでも可</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- スカウト優先度 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">スカウト優先度</h2>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">高時給案件を優先</div>
+                        <div class="setting-description">提示額が高い順にスカウトを表示します</div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">マッチ度優先</div>
+                        <div class="setting-description">あなたの希望条件との合致度が高い順に表示</div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">新着順</div>
+                        <div class="setting-description">新しく届いたスカウトから表示します</div>
+                    </div>
+                    <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+            </div>
+            
+            <!-- プライバシー設定 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">プライバシー設定</h2>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">スカウト受信を有効化</div>
+                        <div class="setting-description">OFFにするとスカウトが届かなくなります</div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">現職からのスカウトをブロック</div>
+                        <div class="setting-description">現在の勤務先からのスカウトを非表示にします</div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                
+                <div class="alert alert-info mt-md">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <strong>ヒント:</strong> プロフィールを充実させると、あなたに合ったスカウトが届きやすくなります。特にスキルや症例数の登録が重要です。
+                </div>
+            </div>
+        </main>
+        
+        <!-- 保存ボタン -->
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; padding: var(--spacing-md); background: var(--bg-white); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); z-index: 100;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="saveSettings()">
+                設定を保存
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        function saveSettings() {
+            alert('設定を保存しました！');
+            // 実際のアプリでは、ここで設定をサーバーに保存
+        }
+    </script>
+</body>
+</html>

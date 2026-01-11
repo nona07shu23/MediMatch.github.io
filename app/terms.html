@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>利用規約 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .legal-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-xl);
+            margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .legal-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .legal-updated {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+        }
+        
+        .legal-content {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .legal-section {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .legal-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legal-section-title {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        
+        .legal-subsection {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .legal-subsection-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .legal-text {
+            font-size: var(--font-size-sm);
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .legal-list {
+            margin-left: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .legal-list li {
+            font-size: var(--font-size-sm);
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .toc {
+            background: var(--bg-gray);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .toc-title {
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .toc-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc-item {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .toc-link {
+            display: block;
+            padding: var(--spacing-sm);
+            color: var(--primary-blue);
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+            transition: background 0.2s;
+        }
+        
+        .toc-link:hover, .toc-link:active {
+            background: var(--light-blue-bg);
+        }
+        
+        .important-notice {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .important-notice-title {
+            font-weight: 700;
+            color: var(--warning);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .contact-box {
+            background: var(--light-blue-bg);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            margin-top: var(--spacing-lg);
+        }
+        
+        .contact-box-title {
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">利用規約</h1>
+            <button class="header-action-btn" onclick="window.print()" aria-label="印刷">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content">
+            <!-- ヘッダー -->
+            <div class="legal-header">
+                <div class="legal-title">MediMatch 利用規約</div>
+                <div class="legal-updated">最終更新日: 2026年1月1日</div>
+            </div>
+            
+            <!-- 目次 -->
+            <div class="toc">
+                <div class="toc-title">目次</div>
+                <ul class="toc-list">
+                    <li class="toc-item"><a href="#section1" class="toc-link">第1条 総則</a></li>
+                    <li class="toc-item"><a href="#section2" class="toc-link">第2条 定義</a></li>
+                    <li class="toc-item"><a href="#section3" class="toc-link">第3条 利用登録</a></li>
+                    <li class="toc-item"><a href="#section4" class="toc-link">第4条 サービスの内容</a></li>
+                    <li class="toc-item"><a href="#section5" class="toc-link">第5条 禁止事項</a></li>
+                    <li class="toc-item"><a href="#section6" class="toc-link">第6条 個人情報の取扱い</a></li>
+                    <li class="toc-item"><a href="#section7" class="toc-link">第7条 免責事項</a></li>
+                    <li class="toc-item"><a href="#section8" class="toc-link">第8条 規約の変更</a></li>
+                </ul>
+            </div>
+            
+            <!-- 本文 -->
+            <div class="legal-content">
+                <!-- 第1条 -->
+                <div class="legal-section" id="section1">
+                    <h2 class="legal-section-title">第1条（総則）</h2>
+                    <p class="legal-text">
+                        本利用規約（以下「本規約」といいます）は、株式会社MediMatch（以下「当社」といいます）が提供する医療人材マッチングサービス「MediMatch」（以下「本サービス」といいます）の利用に関する条件を定めるものです。
+                    </p>
+                    <p class="legal-text">
+                        ユーザーは、本規約に同意した上で本サービスを利用するものとし、本サービスを利用した時点で本規約に同意したものとみなします。
+                    </p>
+                </div>
+                
+                <!-- 第2条 -->
+                <div class="legal-section" id="section2">
+                    <h2 class="legal-section-title">第2条（定義）</h2>
+                    <p class="legal-text">本規約において使用する用語の定義は、次の各号に定めるとおりとします。</p>
+                    <ol class="legal-list">
+                        <li>「本サービス」とは、当社が提供する医療人材マッチングプラットフォームおよびこれに関連するサービスをいいます。</li>
+                        <li>「ユーザー」とは、本規約に同意の上、本サービスを利用する医師および医療機関をいいます。</li>
+                        <li>「医師会員」とは、医師免許を有する個人で、本サービスに会員登録した者をいいます。</li>
+                        <li>「施設会員」とは、医療機関で、本サービスに会員登録した法人または個人をいいます。</li>
+                        <li>「登録情報」とは、ユーザーが本サービスに登録した情報をいいます。</li>
+                    </ol>
+                </div>
+                
+                <!-- 第3条 -->
+                <div class="legal-section" id="section3">
+                    <h2 class="legal-section-title">第3条（利用登録）</h2>
+                    
+                    <div class="legal-subsection">
+                        <h3 class="legal-subsection-title">3.1 登録の申込み</h3>
+                        <p class="legal-text">
+                            本サービスの利用を希望する者は、本規約に同意の上、当社所定の方法により利用登録を申し込むものとします。
+                        </p>
+                    </div>
+                    
+                    <div class="legal-subsection">
+                        <h3 class="legal-subsection-title">3.2 登録の承認</h3>
+                        <p class="legal-text">
+                            当社は、利用登録の申込みがあった場合、当社所定の審査基準に従い、登録の可否を判断し、当社が登録を承認した場合、申込者に対しその旨を通知します。
+                        </p>
+                    </div>
+                    
+                    <div class="legal-subsection">
+                        <h3 class="legal-subsection-title">3.3 登録の拒否</h3>
+                        <p class="legal-text">当社は、以下のいずれかに該当する場合、利用登録を拒否することがあります。</p>
+                        <ul class="legal-list">
+                            <li>登録申込みに際して虚偽の事項を届け出た場合</li>
+                            <li>過去に本規約に違反したことがある場合</li>
+                            <li>医師免許等の必要な資格を有しない場合</li>
+                            <li>反社会的勢力に該当する場合</li>
+                            <li>その他、当社が登録を適当でないと判断した場合</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 第4条 -->
+                <div class="legal-section" id="section4">
+                    <h2 class="legal-section-title">第4条（サービスの内容）</h2>
+                    <p class="legal-text">本サービスは、以下の機能を提供します。</p>
+                    <ol class="legal-list">
+                        <li>医師と医療機関のマッチング機能</li>
+                        <li>求人情報の掲載および検索機能</li>
+                        <li>スカウト機能</li>
+                        <li>メッセージ機能</li>
+                        <li>応募管理機能</li>
+                        <li>その他、当社が提供する関連サービス</li>
+                    </ol>
+                    
+                    <div class="important-notice">
+                        <div class="important-notice-title">重要なお知らせ</div>
+                        <p class="legal-text" style="margin-bottom: 0;">
+                            当社は、医師会員に対して無料でサービスを提供します。施設会員に対しては、有料プランを提供する場合があります。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 第5条 -->
+                <div class="legal-section" id="section5">
+                    <h2 class="legal-section-title">第5条（禁止事項）</h2>
+                    <p class="legal-text">ユーザーは、本サービスの利用にあたり、以下の行為を行ってはなりません。</p>
+                    <ol class="legal-list">
+                        <li>法令または公序良俗に違反する行為</li>
+                        <li>犯罪行為に関連する行為</li>
+                        <li>当社または第三者の知的財産権を侵害する行為</li>
+                        <li>当社または第三者のプライバシーを侵害する行為</li>
+                        <li>虚偽の情報を登録する行為</li>
+                        <li>他のユーザーのアカウントを不正に使用する行為</li>
+                        <li>本サービスの運営を妨げる行為</li>
+                        <li>他のユーザーに対する嫌がらせ、誹謗中傷</li>
+                        <li>営利目的での本サービスの利用（当社が認めた場合を除く）</li>
+                        <li>その他、当社が不適切と判断する行為</li>
+                    </ol>
+                </div>
+                
+                <!-- 第6条 -->
+                <div class="legal-section" id="section6">
+                    <h2 class="legal-section-title">第6条（個人情報の取扱い）</h2>
+                    <p class="legal-text">
+                        当社は、本サービスの提供にあたり取得した個人情報を、当社のプライバシーポリシーに従い、適切に取り扱うものとします。
+                    </p>
+                    <p class="legal-text">
+                        詳細は、<a href="privacy-policy.html" style="color: var(--primary-blue); text-decoration: underline;">プライバシーポリシー</a>をご確認ください。
+                    </p>
+                </div>
+                
+                <!-- 第7条 -->
+                <div class="legal-section" id="section7">
+                    <h2 class="legal-section-title">第7条（免責事項）</h2>
+                    
+                    <div class="legal-subsection">
+                        <h3 class="legal-subsection-title">7.1 サービスの提供</h3>
+                        <p class="legal-text">
+                            当社は、本サービスの内容変更、中断、終了によって生じたいかなる損害についても、一切責任を負いません。
+                        </p>
+                    </div>
+                    
+                    <div class="legal-subsection">
+                        <h3 class="legal-subsection-title">7.2 ユーザー間のトラブル</h3>
+                        <p class="legal-text">
+                            本サービスを通じて行われるユーザー間の取引、連絡、紛争等について、当社は一切責任を負いません。
+                        </p>
+                    </div>
+                    
+                    <div class="legal-subsection">
+                        <h3 class="legal-subsection-title">7.3 情報の正確性</h3>
+                        <p class="legal-text">
+                            当社は、本サービスに掲載された情報の正確性、完全性、有用性について、いかなる保証も行いません。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 第8条 -->
+                <div class="legal-section" id="section8">
+                    <h2 class="legal-section-title">第8条（規約の変更）</h2>
+                    <p class="legal-text">
+                        当社は、必要に応じて本規約を変更することができます。本規約を変更した場合、変更後の規約は本サービス上に掲載した時点から効力を生じるものとします。
+                    </p>
+                    <p class="legal-text">
+                        ユーザーが変更後に本サービスを利用した場合、変更後の規約に同意したものとみなします。
+                    </p>
+                </div>
+                
+                <!-- お問い合わせ -->
+                <div class="contact-box">
+                    <div class="contact-box-title">規約に関するお問い合わせ</div>
+                    <p class="legal-text" style="margin-bottom: var(--spacing-md);">
+                        本規約に関するご質問やご不明な点がございましたら、お気軽にお問い合わせください。
+                    </p>
+                    <button class="btn btn-primary" onclick="location.href='contact.html'">
+                        お問い合わせ
+                    </button>
+                </div>
+            </div>
+            
+            <!-- フッター情報 -->
+            <div class="section">
+                <div style="text-align: center; color: var(--text-secondary); font-size: var(--font-size-sm);">
+                    <p>株式会社MediMatch</p>
+                    <p>〒100-0001 東京都千代田区千代田1-1-1</p>
+                    <p style="margin-top: var(--spacing-md);">
+                        <a href="privacy-policy.html" style="color: var(--primary-blue);">プライバシーポリシー</a>
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // スムーズスクロール
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

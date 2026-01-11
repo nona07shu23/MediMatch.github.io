@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>応募詳細 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: var(--spacing-lg);
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: var(--spacing-lg);
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -23px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-white);
+            border: 3px solid var(--border-color);
+        }
+        
+        .timeline-dot.active {
+            border-color: var(--primary-blue);
+            background: var(--primary-blue);
+        }
+        
+        .timeline-dot.success {
+            border-color: var(--success);
+            background: var(--success);
+        }
+        
+        .timeline-content {
+            background: var(--bg-white);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .timeline-date {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .timeline-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .action-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .action-card-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .action-card-description {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .action-buttons .btn {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">応募詳細</h1>
+            <button class="header-action-btn" onclick="showOptions()" aria-label="メニュー">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content" style="padding-bottom: 100px;">
+            <!-- ステータスヘッダー -->
+            <div class="profile-header" style="margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-md); border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);">
+                <div class="badge" style="background: rgba(255, 255, 255, 0.2); color: white; margin-bottom: var(--spacing-sm);">面接予定</div>
+                <div style="font-size: var(--font-size-xl); font-weight: 600; margin-bottom: var(--spacing-xs);">消化器内科医師（非常勤）</div>
+                <div style="font-size: var(--font-size-base); opacity: 0.9;">東京メディカルセンター</div>
+                <div style="margin-top: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);">
+                    <span style="font-size: var(--font-size-sm);">進捗状況</span>
+                    <div style="flex: 1; background: rgba(255, 255, 255, 0.2); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="background: white; height: 100%; width: 75%; transition: width 0.3s;"></div>
+                    </div>
+                    <span style="font-weight: 600;">75%</span>
+                </div>
+            </div>
+            
+            <!-- 次のアクション -->
+            <div class="action-card">
+                <div class="action-card-title">📅 次のアクション</div>
+                <div class="action-card-description">
+                    面接日程が決定しました<br>
+                    1月20日（月）14:00 - オンライン面談
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" style="background: rgba(255, 255, 255, 0.2); border: 1px solid white; color: white;" onclick="addToCalendar()">
+                        カレンダーに追加
+                    </button>
+                    <button class="btn" style="background: white; color: var(--primary-blue);" onclick="openChat()">
+                        メッセージを送る
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 求人情報 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">求人情報</h2>
+                </div>
+                
+                <div style="display: grid; gap: var(--spacing-md);">
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">勤務形態</div>
+                            <div class="fw-medium">非常勤</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">給与</div>
+                            <div class="fw-medium" style="color: var(--primary-blue);">時給 15,000円</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">勤務地</div>
+                            <div class="fw-medium">東京都渋谷区神宮前1-2-3</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">応募日</div>
+                            <div class="fw-medium">2026年1月5日</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 選考の流れ -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">選考の流れ</h2>
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2026年1月5日</div>
+                            <div class="timeline-title">応募完了</div>
+                            <div class="timeline-description">
+                                応募が完了しました。履歴書が送信されました。
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2026年1月7日</div>
+                            <div class="timeline-title">書類選考通過</div>
+                            <div class="timeline-description">
+                                書類選考に通過しました。面接の日程調整に進みます。
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot active"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2026年1月10日</div>
+                            <div class="timeline-title">面接日程決定</div>
+                            <div class="timeline-description">
+                                <strong>面接日時:</strong> 1月20日（月）14:00<br>
+                                <strong>形式:</strong> オンライン面談（Zoom）<br>
+                                <strong>面接官:</strong> 採用担当 田中様
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">面接実施</div>
+                            <div class="timeline-description">
+                                面接予定日: 2026年1月20日
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">最終結果</div>
+                            <div class="timeline-description">
+                                結果をお待ちください
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 提出書類 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">提出書類</h2>
+                </div>
+                
+                <a href="#" class="list-item">
+                    <div class="list-item-icon" style="background: var(--success-light); color: var(--success);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">履歴書</div>
+                        <div class="list-item-subtitle">提出済み · 2026年1月5日</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+                
+                <a href="#" class="list-item">
+                    <div class="list-item-icon" style="background: var(--success-light); color: var(--success);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">医師免許証</div>
+                        <div class="list-item-subtitle">提出済み · 2026年1月5日</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </main>
+        
+        <!-- アクションボタン -->
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; padding: var(--spacing-md); background: var(--bg-white); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); z-index: 100; display: flex; gap: var(--spacing-sm);">
+            <button class="btn btn-outline" style="flex: 1;" onclick="withdrawApplication()">
+                応募を取り消す
+            </button>
+            <button class="btn btn-primary" style="flex: 2;" onclick="openChat()">
+                メッセージを送る
+            </button>
+        </div>
+    </div>
+    
+    <!-- オプションモーダル -->
+    <div id="optionsModal" class="action-sheet-overlay" style="display: none;" onclick="hideOptions()">
+        <div class="action-sheet" onclick="event.stopPropagation()">
+            <div class="action-sheet-item" onclick="shareApplication()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                共有する
+            </div>
+            <div class="action-sheet-item" onclick="addToCalendar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                カレンダーに追加
+            </div>
+            <div class="action-sheet-item" onclick="viewJobDetail()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                求人詳細を見る
+            </div>
+            <div class="action-sheet-item" onclick="hideOptions()" style="border-top: 1px solid var(--border-color); font-weight: 600;">
+                キャンセル
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        function showOptions() {
+            document.getElementById('optionsModal').style.display = 'flex';
+        }
+        
+        function hideOptions() {
+            document.getElementById('optionsModal').style.display = 'none';
+        }
+        
+        function openChat() {
+            alert('メッセージ画面に移動します');
+            // location.href = 'message-thread.html?id=1';
+        }
+        
+        function addToCalendar() {
+            hideOptions();
+            alert('カレンダーに追加しました');
+        }
+        
+        function withdrawApplication() {
+            if (confirm('この応募を取り消しますか？\n\nこの操作は取り消せません。')) {
+                alert('応募を取り消しました');
+                history.back();
+            }
+        }
+        
+        function shareApplication() {
+            hideOptions();
+            alert('共有機能');
+        }
+        
+        function viewJobDetail() {
+            hideOptions();
+            alert('求人詳細画面に移動します');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>ログイン - MediMatch 医師向けアプリ</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="mobile-login-container" id="main-content">
+        <div class="mobile-logo">
+            <div class="mobile-logo-icon">M</div>
+            <h1 class="mobile-login-title">MediMatch</h1>
+            <p class="mobile-login-subtitle">医師向けアプリ</p>
+        </div>
+        
+        <form class="mobile-login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="email" class="form-label required">メールアドレス</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-control" 
+                    placeholder="doctor@example.com"
+                    required
+                    autocomplete="email"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label required">パスワード</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-control" 
+                    placeholder="••••••••"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+            
+            <div class="form-check mb-lg">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">ログイン状態を保持</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                ログイン
+            </button>
+            
+            <div class="text-center mt-md">
+                <a href="#" class="text-primary">パスワードをお忘れですか？</a>
+            </div>
+            
+            <div class="text-center mt-lg">
+                <p class="text-muted mb-sm" style="font-size: var(--font-size-sm);">アカウントをお持ちでない方</p>
+                <a href="#" class="btn btn-outline btn-lg" style="width: 100%;">新規会員登録（無料）</a>
+            </div>
+            
+            <!-- デモアカウント情報 -->
+            <div class="mobile-demo-info">
+                <div class="demo-info-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    デモアカウント（タップで自動入力）
+                </div>
+                <div class="demo-info-item" onclick="fillDemoAccount('doctor@demo.medimatch.jp', 'demo1234')" style="cursor: pointer; transition: all 0.2s;">
+                    <strong>👨‍⚕️ 医師用デモアカウント</strong>
+                    <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 4px;">
+                        <div>メール: <code>doctor@demo.medimatch.jp</code></div>
+                        <div>パスワード: <code>demo1234</code></div>
+                    </div>
+                </div>
+                <div class="demo-info-item" onclick="fillDemoAccount('facility@demo.medimatch.jp', 'demo1234')" style="cursor: pointer; transition: all 0.2s;">
+                    <strong>🏥 医療機関用（WEB版）</strong>
+                    <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 4px;">
+                        <div>メール: <code>facility@demo.medimatch.jp</code></div>
+                        <div>パスワード: <code>demo1234</code></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // デモ用の簡易ログイン処理
+            if (email === DEMO_ACCOUNTS.doctor.email && password === DEMO_ACCOUNTS.doctor.password) {
+                // ログイン成功
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userType', 'doctor');
+                sessionStorage.setItem('userName', DEMO_ACCOUNTS.doctor.name);
+                
+                // ホーム画面へリダイレクト
+                window.location.href = 'home.html';
+            } else {
+                // ログイン失敗
+                alert('メールアドレスまたはパスワードが正しくありません。\n\nデモアカウント:\ndoctor@demo.medimatch.jp / demo1234');
+            }
+        }
+        
+        // デモアカウントを自動入力する関数
+        function fillDemoAccount(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+            
+            // 入力フィールドをハイライト
+            const emailField = document.getElementById('email');
+            const passwordField = document.getElementById('password');
+            
+            emailField.style.backgroundColor = '#e3f2fd';
+            passwordField.style.backgroundColor = '#e3f2fd';
+            
+            setTimeout(() => {
+                emailField.style.backgroundColor = '';
+                passwordField.style.backgroundColor = '';
+            }, 1000);
+            
+            // 成功フィードバック
+            const accountType = email.includes('facility') ? '医療機関' : '医師';
+            showToast(`✅ ${accountType}用デモアカウントを入力しました`);
+        }
+        
+        // トースト通知を表示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #2e7d32;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: 500;
+                font-size: 14px;
+                animation: slideDown 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+        
+        // アニメーション用CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from {
+                    transform: translateX(-50%) translateY(-100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(-50%) translateY(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideUp {
+                from {
+                    transform: translateX(-50%) translateY(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(-50%) translateY(-100%);
+                    opacity: 0;
+                }
+            }
+            .demo-info-item:active {
+                background-color: #f0f7ff !important;
+                transform: scale(0.98);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

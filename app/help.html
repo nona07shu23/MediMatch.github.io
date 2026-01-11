@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ヘルプ・FAQ - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .help-hero {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-xl);
+            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+            margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .help-hero-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--spacing-md);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .help-hero-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .help-hero-description {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+        }
+        
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .quick-link-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .quick-link-card:active {
+            transform: scale(0.98);
+        }
+        
+        .quick-link-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--spacing-sm);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quick-link-title {
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+        }
+        
+        .faq-category {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .faq-category-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .faq-category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .faq-category-title {
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .faq-item {
+            margin-bottom: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+        }
+        
+        .faq-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .faq-question {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            background: var(--bg-white);
+            transition: background 0.2s;
+        }
+        
+        .faq-question:active {
+            background: var(--bg-gray);
+        }
+        
+        .faq-q-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--font-size-sm);
+            flex-shrink: 0;
+        }
+        
+        .faq-question-text {
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .faq-chevron {
+            flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+        
+        .faq-item.open .faq-chevron {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+        }
+        
+        .faq-answer-content {
+            padding: var(--spacing-md);
+            padding-top: 0;
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .faq-a-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--success);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--font-size-sm);
+            flex-shrink: 0;
+        }
+        
+        .faq-answer-text {
+            flex: 1;
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .contact-cards {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+        
+        .contact-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+        
+        .contact-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto var(--spacing-md);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .contact-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .contact-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .contact-detail {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">ヘルプ・FAQ</h1>
+            <button class="header-action-btn" onclick="location.href='contact.html'" aria-label="お問い合わせ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content">
+            <!-- ヒーローセクション -->
+            <div class="help-hero">
+                <div class="help-hero-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="help-hero-title">お困りですか？</div>
+                <div class="help-hero-description">よくある質問をご確認いただくか、サポートチームまでお問い合わせください</div>
+            </div>
+            
+            <!-- 検索 -->
+            <div class="section">
+                <div class="mobile-search-box">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="質問を検索..." id="searchInput" oninput="searchFAQ(this.value)">
+                </div>
+            </div>
+            
+            <!-- クイックリンク -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">クイックリンク</h2>
+                </div>
+                
+                <div class="quick-links">
+                    <a href="#getting-started" class="quick-link-card" onclick="scrollToSection('getting-started'); return false;">
+                        <div class="quick-link-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="quick-link-title">はじめ方</div>
+                    </a>
+                    
+                    <a href="#application" class="quick-link-card" onclick="scrollToSection('application'); return false;">
+                        <div class="quick-link-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="quick-link-title">応募について</div>
+                    </a>
+                    
+                    <a href="#scout" class="quick-link-card" onclick="scrollToSection('scout'); return false;">
+                        <div class="quick-link-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="quick-link-title">スカウト</div>
+                    </a>
+                    
+                    <a href="#account" class="quick-link-card" onclick="scrollToSection('account'); return false;">
+                        <div class="quick-link-icon" style="background: var(--info-light); color: var(--info);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m0-18l-4 4m4-4l4 4M1 12h6m6 0h6m-18 0l4-4m-4 4l4 4m18-4l-4-4m4 4l-4 4"></path>
+                            </svg>
+                        </div>
+                        <div class="quick-link-title">アカウント</div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- はじめ方 -->
+            <div class="section" id="getting-started">
+                <div class="section-header">
+                    <h2 class="section-title">はじめ方</h2>
+                </div>
+                
+                <div class="faq-category">
+                    <div class="faq-category-header">
+                        <div class="faq-category-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-category-title">基本的な使い方</div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">MediMatchとは何ですか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    MediMatchは医師と医療機関をつなぐマッチングプラットフォームです。常勤・非常勤・スポットなど、様々な働き方の求人を掲載しており、AIによるマッチング機能で最適な求人をご提案します。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">登録に費用はかかりますか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    いいえ、医師の方の登録・利用は完全無料です。求人検索、応募、スカウト受信など、すべての機能を無料でご利用いただけます。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">プロフィールは何を登録すべきですか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    基本情報（氏名、専門科、経験年数）、医師免許証、希望条件（勤務地、給与、勤務形態）を登録してください。プロフィール完成度が高いほど、マッチする求人やスカウトが増えます。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 応募について -->
+            <div class="section" id="application">
+                <div class="section-header">
+                    <h2 class="section-title">応募について</h2>
+                </div>
+                
+                <div class="faq-category">
+                    <div class="faq-category-header">
+                        <div class="faq-category-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-category-title">求人への応募</div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">応募後の流れを教えてください</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    1. 応募ボタンをクリック<br>
+                                    2. 施設が書類を確認（1-3営業日）<br>
+                                    3. 書類選考通過後、面接日程調整<br>
+                                    4. 面接実施<br>
+                                    5. 最終結果の通知<br>
+                                    各段階でアプリ内通知とメールでお知らせします。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">同時に何件まで応募できますか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    応募数に制限はありません。ただし、複数の求人に同時応募する場合は、面接日程の調整が必要になることがあります。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">応募を取り消すことはできますか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    はい、書類選考中であれば応募を取り消すことができます。応募状況画面から「応募を取り消す」ボタンをクリックしてください。ただし、面接日程が確定した後の取り消しはできません。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- スカウト -->
+            <div class="section" id="scout">
+                <div class="section-header">
+                    <h2 class="section-title">スカウト</h2>
+                </div>
+                
+                <div class="faq-category">
+                    <div class="faq-category-header">
+                        <div class="faq-category-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-category-title">スカウト機能</div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">スカウトとは何ですか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    医療機関からあなたのプロフィールを見て直接オファーが届く機能です。あなたの経験やスキルに興味を持った施設から、条件の良い求人をご紹介できます。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">スカウトを受け取るにはどうすればいいですか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    プロフィールを充実させることが重要です。特に専門科、経験年数、希望条件を詳しく記入すると、マッチ度の高いスカウトが届きやすくなります。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">スカウトは断ることができますか？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    はい、興味がない場合は「辞退」ボタンをクリックしてください。辞退してもペナルティはありませんし、今後のスカウトに影響することもありません。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- アカウント -->
+            <div class="section" id="account">
+                <div class="section-header">
+                    <h2 class="section-title">アカウント</h2>
+                </div>
+                
+                <div class="faq-category">
+                    <div class="faq-category-header">
+                        <div class="faq-category-icon" style="background: var(--info-light); color: var(--info);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m0-18l-4 4m4-4l4 4M1 12h6m6 0h6m-18 0l4-4m-4 4l4 4m18-4l-4-4m4 4l-4 4"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-category-title">アカウント設定</div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">パスワードを忘れた場合は？</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    ログイン画面の「パスワードを忘れた方」をクリックしてください。登録メールアドレスにパスワード再設定用のリンクを送信します。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">メールアドレスを変更したい</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    マイページ > アカウント設定 > メールアドレスから変更できます。新しいメールアドレスに確認メールを送信しますので、メール内のリンクをクリックして変更を完了してください。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">
+                            <div class="faq-q-icon">Q</div>
+                            <div class="faq-question-text">アカウントを削除したい</div>
+                            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="faq-a-icon">A</div>
+                                <div class="faq-answer-text">
+                                    マイページ > アカウント設定 > アカウントを削除から手続きできます。削除後30日間は猶予期間があり、その間にログインすると削除をキャンセルできます。30日経過後に完全に削除されます。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- お問い合わせ -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">それでも解決しない場合</h2>
+                </div>
+                
+                <div class="contact-cards">
+                    <div class="contact-card">
+                        <div class="contact-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="contact-title">メールでお問い合わせ</div>
+                        <div class="contact-description">24時間受付、1営業日以内に返信</div>
+                        <div class="contact-detail">support@medimatch.jp</div>
+                        <button class="btn btn-primary" onclick="location.href='contact.html'">メールを送る</button>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                        </div>
+                        <div class="contact-title">電話でお問い合わせ</div>
+                        <div class="contact-description">平日 10:00-18:00</div>
+                        <div class="contact-detail">0120-XXX-XXX（通話無料）</div>
+                        <button class="btn btn-outline" onclick="callSupport()">電話をかける</button>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="contact-title">チャットサポート</div>
+                        <div class="contact-description">平日 10:00-18:00</div>
+                        <div class="contact-detail">リアルタイムでご相談</div>
+                        <button class="btn btn-outline" onclick="openChat()">チャットを開始</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // FAQ開閉
+        function toggleFAQ(element) {
+            const isOpen = element.classList.contains('open');
+            
+            // すべてのFAQを閉じる（オプション）
+            // document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('open'));
+            
+            // クリックされたFAQを開閉
+            if (isOpen) {
+                element.classList.remove('open');
+            } else {
+                element.classList.add('open');
+            }
+        }
+        
+        // セクションスクロール
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // FAQ検索
+        function searchFAQ(query) {
+            const lowerQuery = query.toLowerCase();
+            const faqItems = document.querySelectorAll('.faq-item');
+            let hasResults = false;
+            
+            faqItems.forEach(item => {
+                const questionText = item.querySelector('.faq-question-text').textContent.toLowerCase();
+                const answerText = item.querySelector('.faq-answer-text').textContent.toLowerCase();
+                
+                if (questionText.includes(lowerQuery) || answerText.includes(lowerQuery)) {
+                    item.style.display = 'block';
+                    hasResults = true;
+                    
+                    // 検索結果がある場合は自動的に開く
+                    if (query.length > 0) {
+                        item.classList.add('open');
+                    }
+                } else {
+                    item.style.display = query.length > 0 ? 'none' : 'block';
+                    if (query.length > 0) {
+                        item.classList.remove('open');
+                    }
+                }
+            });
+            
+            // カテゴリーの表示/非表示
+            document.querySelectorAll('.faq-category').forEach(category => {
+                const visibleItems = category.querySelectorAll('.faq-item[style*="display: block"]').length;
+                category.style.display = visibleItems > 0 || query.length === 0 ? 'block' : 'none';
+            });
+        }
+        
+        // 電話サポート
+        function callSupport() {
+            window.location.href = 'tel:0120-XXX-XXX';
+        }
+        
+        // チャットサポート
+        function openChat() {
+            alert('チャットサポートを開始します');
+            // 実際の実装ではチャットウィジェットを開く
+        }
+    </script>
+</body>
+</html>

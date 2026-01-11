@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>応募管理 - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .filter-bar {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .filter-group label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .tab:hover {
+            color: var(--primary-blue);
+            background-color: var(--gray-50);
+        }
+        
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+        
+        .tab .count {
+            background-color: var(--gray-200);
+            color: var(--text-primary);
+            padding: 2px 8px;
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .tab.active .count {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .application-card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .application-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-blue);
+        }
+        
+        .application-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+            gap: var(--spacing-md);
+        }
+        
+        .application-doctor-info {
+            display: flex;
+            gap: var(--spacing-md);
+            flex: 1;
+        }
+        
+        .application-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .application-doctor-details {
+            flex: 1;
+        }
+        
+        .application-doctor-name {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .application-doctor-specialty {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .application-doctor-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .application-status-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: var(--spacing-sm);
+        }
+        
+        .application-date {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .application-body {
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .application-job-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-blue);
+        }
+        
+        .application-job-meta {
+            display: flex;
+            gap: var(--spacing-lg);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .application-message {
+            background-color: var(--gray-50);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-secondary);
+        }
+        
+        .application-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: flex-end;
+        }
+        
+        .status-select {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            background-color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .status-select:hover {
+            border-color: var(--primary-blue);
+        }
+        
+        .status-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px var(--primary-blue-light);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-4xl) var(--spacing-xl);
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.3;
+        }
+        
+        .empty-state-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .empty-state-text {
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .application-card-header {
+                flex-direction: column;
+            }
+            
+            .application-status-section {
+                align-items: flex-start;
+            }
+            
+            .application-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                    <span class="badge badge-error" style="margin-left: auto;">12</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">応募管理</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <a href="dashboard.html">ホーム</a>
+                        <span class="breadcrumb-separator">›</span>
+                        <span>応募管理</span>
+                    </div>
+                    
+                    <div class="content-header-top">
+                        <div>
+                            <h2 class="mb-xs">応募管理</h2>
+                            <p class="text-muted mb-0">求人への応募を管理・選考できます</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- タブ -->
+                <div class="tabs">
+                    <button class="tab active" onclick="filterByStatus('all')">
+                        すべて
+                        <span class="count" id="countAll">24</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('new')">
+                        新着
+                        <span class="count" id="countNew">12</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('screening')">
+                        書類選考中
+                        <span class="count" id="countScreening">8</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('interview')">
+                        面接調整中
+                        <span class="count" id="countInterview">3</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('offer')">
+                        内定
+                        <span class="count" id="countOffer">1</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('rejected')">
+                        不採用
+                        <span class="count" id="countRejected">0</span>
+                    </button>
+                </div>
+                
+                <!-- フィルターバー -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label for="jobFilter">求人</label>
+                        <select class="select" id="jobFilter" onchange="applyFilters()">
+                            <option value="">すべての求人</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="sortFilter">並び替え</label>
+                        <select class="select" id="sortFilter" onchange="applyFilters()">
+                            <option value="date-desc">応募日（新しい順）</option>
+                            <option value="date-asc">応募日（古い順）</option>
+                            <option value="name-asc">氏名（昇順）</option>
+                            <option value="name-desc">氏名（降順）</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group" style="margin-left: auto;">
+                        <div class="input-group">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            <input 
+                                type="text" 
+                                class="input" 
+                                id="searchInput" 
+                                placeholder="医師名で検索"
+                                style="padding-left: 40px;"
+                                oninput="applyFilters()"
+                            >
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 応募一覧 -->
+                <div id="applicationsList">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // 応募データの生成
+        const applications = [];
+        const statuses = [
+            { value: 'new', label: '新着', class: 'warning' },
+            { value: 'screening', label: '書類選考中', class: 'info' },
+            { value: 'interview', label: '面接調整中', class: 'primary' },
+            { value: 'offer', label: '内定', class: 'success' },
+            { value: 'rejected', label: '不採用', class: 'gray' }
+        ];
+        
+        // デモ応募データを生成（24件）
+        const statusDistribution = [
+            ...Array(12).fill('new'),
+            ...Array(8).fill('screening'),
+            ...Array(3).fill('interview'),
+            ...Array(1).fill('offer')
+        ];
+        
+        DEMO_DOCTORS.slice(0, 24).forEach((doctor, index) => {
+            const job = DEMO_JOBS[index % DEMO_JOBS.length];
+            const daysAgo = index; // 応募日（何日前）
+            const applicationDate = new Date();
+            applicationDate.setDate(applicationDate.getDate() - daysAgo);
+            
+            applications.push({
+                id: index + 1,
+                doctor: doctor,
+                job: job,
+                status: statusDistribution[index] || 'new',
+                appliedDate: applicationDate,
+                message: `${job.title}のポジションに応募させていただきます。${doctor.experience}年の経験を活かし、貴院の医療サービス向上に貢献したいと考えております。ぜひ一度お話しする機会をいただけますと幸いです。よろしくお願いいたします。`
+            });
+        });
+        
+        let currentStatusFilter = 'all';
+        
+        // 求人フィルターの初期化
+        function initJobFilter() {
+            const jobFilter = document.getElementById('jobFilter');
+            const uniqueJobs = [...new Set(DEMO_JOBS.slice(0, 10).map(j => j.title))];
+            
+            uniqueJobs.forEach(jobTitle => {
+                const option = document.createElement('option');
+                option.value = jobTitle;
+                option.textContent = jobTitle;
+                jobFilter.appendChild(option);
+            });
+        }
+        
+        // 応募一覧の表示
+        function displayApplications(filteredApplications = applications) {
+            const container = document.getElementById('applicationsList');
+            container.innerHTML = '';
+            
+            if (filteredApplications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div class="empty-state-title">応募がありません</div>
+                        <div class="empty-state-text">条件に一致する応募が見つかりませんでした。</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredApplications.forEach(app => {
+                const statusInfo = statuses.find(s => s.value === app.status);
+                const card = document.createElement('div');
+                card.className = 'application-card';
+                card.onclick = () => viewApplicationDetail(app.id);
+                
+                card.innerHTML = `
+                    <div class="application-card-header">
+                        <div class="application-doctor-info">
+                            <div class="application-avatar">${app.doctor.name.substring(0, 1)}</div>
+                            <div class="application-doctor-details">
+                                <div class="application-doctor-name">${app.doctor.name}</div>
+                                <div class="application-doctor-specialty">${app.doctor.specialty} / ${app.doctor.subSpecialty}</div>
+                                <div class="application-doctor-meta">
+                                    <span>経験${app.doctor.experience}年</span>
+                                    <span>•</span>
+                                    <span>${app.doctor.age}歳</span>
+                                    <span>•</span>
+                                    <span>${app.doctor.preferredLocations[0]}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="application-status-section">
+                            <span class="badge badge-${statusInfo.class}">${statusInfo.label}</span>
+                            <div class="application-date">${formatDate(app.appliedDate)}</div>
+                        </div>
+                    </div>
+                    <div class="application-body">
+                        <div class="application-job-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 4px;">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            ${app.job.title}
+                        </div>
+                        <div class="application-job-meta">
+                            <span>${app.job.specialty}</span>
+                            <span>•</span>
+                            <span>${app.job.employmentType}</span>
+                            <span>•</span>
+                            <span>${app.job.location}</span>
+                        </div>
+                        <div class="application-message">
+                            💬 ${app.message.substring(0, 100)}${app.message.length > 100 ? '...' : ''}
+                        </div>
+                        <div class="application-actions" onclick="event.stopPropagation()">
+                            <select class="status-select" onchange="updateStatus(${app.id}, this.value)">
+                                <option value="">ステータス変更</option>
+                                ${statuses.map(s => `<option value="${s.value}" ${s.value === app.status ? 'selected' : ''}>${s.label}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-outline btn-sm" onclick="viewDoctorProfile(${app.doctor.id})">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                プロフィール
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="sendMessage(${app.id})">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                メッセージ
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // ステータス別フィルター
+        function filterByStatus(status) {
+            currentStatusFilter = status;
+            
+            // タブのアクティブ状態を更新
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.tab').classList.add('active');
+            
+            applyFilters();
+        }
+        
+        // フィルター適用
+        function applyFilters() {
+            let filtered = [...applications];
+            
+            // ステータスフィルター
+            if (currentStatusFilter !== 'all') {
+                filtered = filtered.filter(app => app.status === currentStatusFilter);
+            }
+            
+            // 求人フィルター
+            const jobFilter = document.getElementById('jobFilter').value;
+            if (jobFilter) {
+                filtered = filtered.filter(app => app.job.title === jobFilter);
+            }
+            
+            // 検索フィルター
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            if (searchQuery) {
+                filtered = filtered.filter(app => 
+                    app.doctor.name.toLowerCase().includes(searchQuery)
+                );
+            }
+            
+            // 並び替え
+            const sortBy = document.getElementById('sortFilter').value;
+            switch (sortBy) {
+                case 'date-desc':
+                    filtered.sort((a, b) => b.appliedDate - a.appliedDate);
+                    break;
+                case 'date-asc':
+                    filtered.sort((a, b) => a.appliedDate - b.appliedDate);
+                    break;
+                case 'name-asc':
+                    filtered.sort((a, b) => a.doctor.name.localeCompare(b.doctor.name));
+                    break;
+                case 'name-desc':
+                    filtered.sort((a, b) => b.doctor.name.localeCompare(a.doctor.name));
+                    break;
+            }
+            
+            displayApplications(filtered);
+        }
+        
+        // ステータス更新
+        function updateStatus(appId, newStatus) {
+            if (!newStatus) return;
+            
+            const app = applications.find(a => a.id === appId);
+            if (app) {
+                app.status = newStatus;
+                
+                const statusInfo = statuses.find(s => s.value === newStatus);
+                alert(`✅ ステータスを「${statusInfo.label}」に変更しました。`);
+                
+                // カウントを更新
+                updateCounts();
+                applyFilters();
+            }
+        }
+        
+        // カウント更新
+        function updateCounts() {
+            document.getElementById('countAll').textContent = applications.length;
+            document.getElementById('countNew').textContent = applications.filter(a => a.status === 'new').length;
+            document.getElementById('countScreening').textContent = applications.filter(a => a.status === 'screening').length;
+            document.getElementById('countInterview').textContent = applications.filter(a => a.status === 'interview').length;
+            document.getElementById('countOffer').textContent = applications.filter(a => a.status === 'offer').length;
+            document.getElementById('countRejected').textContent = applications.filter(a => a.status === 'rejected').length;
+        }
+        
+        // 応募詳細表示
+        function viewApplicationDetail(appId) {
+            window.location.href = `application-detail.html?id=${appId}`;
+        }
+        
+        // 医師プロフィール表示
+        function viewDoctorProfile(doctorId) {
+            window.location.href = 'doctor-detail.html';
+        }
+        
+        // メッセージ送信
+        function sendMessage(appId) {
+            const app = applications.find(a => a.id === appId);
+            if (app) {
+                alert(`💬 ${app.doctor.name}さんへのメッセージ画面を開きます。\n\n（メッセージ機能は別途実装予定）`);
+            }
+        }
+        
+        // 初期化
+        initJobFilter();
+        updateCounts();
+        displayApplications();
+    </script>
+</body>
+</html>

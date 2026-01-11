@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>書類管理 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .document-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            position: relative;
+        }
+        
+        .document-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .document-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .document-info {
+            flex: 1;
+        }
+        
+        .document-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .document-meta {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .document-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .document-status.verified {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .document-status.pending {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .document-status.expired {
+            background: var(--error-light);
+            color: var(--error);
+        }
+        
+        .document-status.missing {
+            background: var(--gray-100);
+            color: var(--text-secondary);
+        }
+        
+        .document-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .document-action-btn {
+            flex: 1;
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .document-action-btn:active {
+            transform: scale(0.98);
+            background: var(--bg-gray);
+        }
+        
+        .document-thumbnail {
+            width: 100%;
+            height: 120px;
+            background: var(--bg-gray);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .document-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .document-thumbnail-placeholder {
+            color: var(--text-muted);
+        }
+        
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .upload-zone:active {
+            background: var(--bg-gray);
+        }
+        
+        .upload-zone-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--spacing-md);
+            border-radius: 50%;
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-zone-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .upload-zone-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .required-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            background: var(--error-light);
+            color: var(--error);
+            margin-left: var(--spacing-xs);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: var(--spacing-xs);
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">書類管理</h1>
+            <button class="header-action-btn" onclick="showHelp()" aria-label="ヘルプ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content">
+            <!-- 完成度 -->
+            <div class="section">
+                <div class="mobile-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm);">
+                        <span class="fw-semibold">書類の完成度</span>
+                        <span class="text-primary fw-semibold" style="font-size: var(--font-size-lg);" id="completionRate">75%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" id="completionBar" style="width: 75%;"></div>
+                    </div>
+                    <div class="alert alert-info mt-md">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        専門医資格証明書を追加すると完成度100%になります
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 必須書類 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">必須書類</h2>
+                    <span class="text-muted" style="font-size: var(--font-size-sm);">2/2完了</span>
+                </div>
+                
+                <!-- 履歴書 -->
+                <div class="document-card">
+                    <div class="document-header">
+                        <div class="document-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="document-info">
+                            <div class="document-title">履歴書</div>
+                            <div class="document-meta">更新日: 2025年12月15日</div>
+                        </div>
+                        <div class="document-status verified">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            承認済
+                        </div>
+                    </div>
+                    <div class="document-thumbnail">
+                        <div class="document-thumbnail-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="document-action-btn" onclick="viewDocument('resume')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            表示
+                        </button>
+                        <button class="document-action-btn" onclick="downloadDocument('resume')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            DL
+                        </button>
+                        <button class="document-action-btn" onclick="updateDocument('resume')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            更新
+                        </button>
+                        <button class="document-action-btn" onclick="deleteDocument('resume')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            削除
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 医師免許証 -->
+                <div class="document-card">
+                    <div class="document-header">
+                        <div class="document-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <div class="document-info">
+                            <div class="document-title">医師免許証</div>
+                            <div class="document-meta">更新日: 2026年1月5日</div>
+                        </div>
+                        <div class="document-status verified">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            承認済
+                        </div>
+                    </div>
+                    <div class="document-thumbnail">
+                        <div class="document-thumbnail-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="document-action-btn" onclick="viewDocument('license')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            表示
+                        </button>
+                        <button class="document-action-btn" onclick="downloadDocument('license')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            DL
+                        </button>
+                        <button class="document-action-btn" onclick="updateDocument('license')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            更新
+                        </button>
+                        <button class="document-action-btn" onclick="deleteDocument('license')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            削除
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 任意書類 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">任意書類</h2>
+                    <span class="text-muted" style="font-size: var(--font-size-sm);">1/3完了</span>
+                </div>
+                
+                <!-- 専門医資格証明書 -->
+                <div class="document-card">
+                    <div class="document-header">
+                        <div class="document-icon" style="background: var(--gray-100); color: var(--text-secondary);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="8" r="7"></circle>
+                                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                            </svg>
+                        </div>
+                        <div class="document-info">
+                            <div class="document-title">専門医資格証明書</div>
+                            <div class="document-meta">未登録</div>
+                        </div>
+                        <div class="document-status missing">未登録</div>
+                    </div>
+                    <div class="upload-zone" onclick="uploadDocument('certification')">
+                        <div class="upload-zone-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="upload-zone-title">書類をアップロード</div>
+                        <div class="upload-zone-description">タップして書類を選択してください</div>
+                    </div>
+                </div>
+                
+                <!-- 卒業証明書 -->
+                <div class="document-card">
+                    <div class="document-header">
+                        <div class="document-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                            </svg>
+                        </div>
+                        <div class="document-info">
+                            <div class="document-title">卒業証明書</div>
+                            <div class="document-meta">更新日: 2025年10月20日</div>
+                        </div>
+                        <div class="document-status verified">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            承認済
+                        </div>
+                    </div>
+                    <div class="document-thumbnail">
+                        <div class="document-thumbnail-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="document-action-btn" onclick="viewDocument('diploma')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            表示
+                        </button>
+                        <button class="document-action-btn" onclick="downloadDocument('diploma')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            DL
+                        </button>
+                        <button class="document-action-btn" onclick="updateDocument('diploma')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            更新
+                        </button>
+                        <button class="document-action-btn" onclick="deleteDocument('diploma')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            削除
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 職務経歴書 -->
+                <div class="document-card">
+                    <div class="document-header">
+                        <div class="document-icon" style="background: var(--gray-100); color: var(--text-secondary);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <div class="document-info">
+                            <div class="document-title">職務経歴書</div>
+                            <div class="document-meta">未登録</div>
+                        </div>
+                        <div class="document-status missing">未登録</div>
+                    </div>
+                    <div class="upload-zone" onclick="uploadDocument('career')">
+                        <div class="upload-zone-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="upload-zone-title">書類をアップロード</div>
+                        <div class="upload-zone-description">タップして書類を選択してください</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- アップロード可能な形式 -->
+            <div class="section">
+                <div class="alert alert-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <div>
+                        <div class="fw-semibold mb-xs">アップロード可能な形式</div>
+                        <div style="font-size: var(--font-size-sm);">
+                            PDF, JPEG, PNG（最大10MB）
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 注意事項 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">注意事項</h2>
+                </div>
+                
+                <a href="#" class="list-item">
+                    <div class="list-item-icon" style="background: var(--info-light); color: var(--info);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">プライバシーとセキュリティ</div>
+                        <div class="list-item-subtitle">書類は暗号化して保存されます</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+                
+                <a href="#" class="list-item">
+                    <div class="list-item-icon" style="background: var(--warning-light); color: var(--warning);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">承認には時間がかかる場合があります</div>
+                        <div class="list-item-subtitle">通常1-3営業日程度</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </main>
+    </div>
+    
+    <!-- アップロードモーダル -->
+    <div id="uploadModal" class="action-sheet-overlay" style="display: none;" onclick="hideUploadModal()">
+        <div class="action-sheet" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom: var(--spacing-lg);">書類のアップロード</h3>
+            
+            <div class="action-sheet-item" onclick="selectFromCamera()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                カメラで撮影
+            </div>
+            
+            <div class="action-sheet-item" onclick="selectFromGallery()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                ギャラリーから選択
+            </div>
+            
+            <div class="action-sheet-item" onclick="selectFromFiles()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                    <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
+                ファイルから選択
+            </div>
+            
+            <div class="action-sheet-item" onclick="hideUploadModal()" style="border-top: 1px solid var(--border-color); font-weight: 600;">
+                キャンセル
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        let currentUploadType = '';
+        
+        // 書類表示
+        function viewDocument(type) {
+            alert(`${type}の書類を表示します`);
+        }
+        
+        // 書類ダウンロード
+        function downloadDocument(type) {
+            alert(`${type}の書類をダウンロードします`);
+        }
+        
+        // 書類更新
+        function updateDocument(type) {
+            currentUploadType = type;
+            showUploadModal();
+        }
+        
+        // 書類削除
+        function deleteDocument(type) {
+            if (confirm('この書類を削除しますか？\n\n削除した書類は復元できません。')) {
+                alert(`${type}の書類を削除しました`);
+            }
+        }
+        
+        // 書類アップロード
+        function uploadDocument(type) {
+            currentUploadType = type;
+            showUploadModal();
+        }
+        
+        // アップロードモーダル表示
+        function showUploadModal() {
+            document.getElementById('uploadModal').style.display = 'flex';
+        }
+        
+        function hideUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+        }
+        
+        // カメラから選択
+        function selectFromCamera() {
+            hideUploadModal();
+            alert('カメラを起動します');
+            // 実際の実装ではカメラAPIを使用
+        }
+        
+        // ギャラリーから選択
+        function selectFromGallery() {
+            hideUploadModal();
+            alert('ギャラリーを開きます');
+            // 実際の実装ではファイル選択APIを使用
+        }
+        
+        // ファイルから選択
+        function selectFromFiles() {
+            hideUploadModal();
+            alert('ファイルを選択します');
+            // 実際の実装ではファイル選択APIを使用
+        }
+        
+        // ヘルプ表示
+        function showHelp() {
+            alert('書類管理のヘルプ\n\n必須書類：履歴書、医師免許証\n任意書類：専門医資格証明書、卒業証明書、職務経歴書\n\nアップロード可能な形式：PDF, JPEG, PNG（最大10MB）');
+        }
+    </script>
+</body>
+</html>

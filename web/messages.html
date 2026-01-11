@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メッセージ - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .messages-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            height: calc(100vh - 140px);
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+        }
+        
+        .messages-sidebar {
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-white);
+        }
+        
+        .messages-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .messages-header h2 {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .messages-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+        
+        .message-tab {
+            flex: 1;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .message-tab:hover {
+            color: var(--primary-blue);
+            background-color: var(--gray-50);
+        }
+        
+        .message-tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+        
+        .messages-search {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .message-item {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: flex-start;
+        }
+        
+        .message-item:hover {
+            background-color: var(--gray-50);
+        }
+        
+        .message-item.active {
+            background-color: var(--primary-blue-light);
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .message-item.unread {
+            background-color: #f0f7ff;
+        }
+        
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .message-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .message-item.unread .message-name {
+            font-weight: 700;
+        }
+        
+        .message-time {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        
+        .message-subject {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .message-preview {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .message-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .messages-main {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--gray-50);
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: var(--spacing-4xl);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.3;
+        }
+        
+        .empty-state-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .empty-state-text {
+            color: var(--text-muted);
+        }
+        
+        @media (max-width: 1024px) {
+            .messages-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .messages-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .messages-main {
+                display: none;
+            }
+            
+            .messages-main.show-mobile {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                    <span class="badge badge-error" style="margin-left: auto;">12</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">メッセージ</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="breadcrumb mb-lg">
+                    <a href="dashboard.html">ホーム</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>メッセージ</span>
+                </div>
+                
+                <!-- メッセージレイアウト -->
+                <div class="messages-layout">
+                    <!-- サイドバー（メッセージリスト） -->
+                    <div class="messages-sidebar">
+                        <div class="messages-header">
+                            <h2>メッセージ</h2>
+                            <div class="messages-tabs">
+                                <button class="message-tab active" onclick="filterMessages('all')">
+                                    すべて
+                                </button>
+                                <button class="message-tab" onclick="filterMessages('unread')">
+                                    未読 <span class="badge badge-error" style="margin-left: 4px;">3</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="messages-search">
+                            <div class="input-group">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                                <input 
+                                    type="text" 
+                                    class="input" 
+                                    id="searchInput" 
+                                    placeholder="メッセージを検索"
+                                    style="padding-left: 40px;"
+                                    oninput="searchMessages()"
+                                >
+                            </div>
+                        </div>
+                        
+                        <div class="messages-list" id="messagesList">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- メインエリア -->
+                    <div class="messages-main">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <div class="empty-state-title">メッセージを選択してください</div>
+                            <div class="empty-state-text">左側のリストからメッセージを選択すると、会話の内容が表示されます。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // メッセージデータの生成
+        const messages = [];
+        
+        const subjects = [
+            '応募に関するご質問',
+            'スカウトへの返信',
+            '面接日程のご相談',
+            '求人内容の確認',
+            '勤務条件について',
+            '履歴書の提出について',
+            '面接のお礼',
+            '内定のご連絡',
+            '入職日の調整',
+            '契約内容の確認'
+        ];
+        
+        const previews = [
+            'ご連絡ありがとうございます。面接日程について、来週の火曜日14時以降でしたら...',
+            '貴院の求人に大変興味があります。詳細についてお話を伺えればと思います...',
+            '先日はお時間をいただきありがとうございました。面接の結果についてご連絡...',
+            '求人内容について、いくつかご質問させていただきたく存じます...',
+            '当直の頻度や勤務時間について、もう少し詳しく教えていただけますでしょうか...',
+            '履歴書と職務経歴書を添付いたしました。ご確認いただけますと幸いです...',
+            '本日は貴重なお時間をありがとうございました。面接でのお話を通して...',
+            'この度は内定のご連絡をいただき、誠にありがとうございます...',
+            '入職日について、4月1日からでよろしいでしょうか。ご確認お願いいたします...',
+            '契約書の内容を確認いたしました。いくつか質問がございます...'
+        ];
+        
+        // デモメッセージデータを生成（15件）
+        DEMO_DOCTORS.slice(0, 15).forEach((doctor, index) => {
+            const hoursAgo = index * 3; // メッセージ時刻（何時間前）
+            const messageDate = new Date();
+            messageDate.setHours(messageDate.getHours() - hoursAgo);
+            
+            const isUnread = index < 3; // 最初の3件を未読にする
+            
+            messages.push({
+                id: index + 1,
+                doctor: doctor,
+                subject: subjects[index % subjects.length],
+                preview: previews[index % previews.length],
+                lastMessageDate: messageDate,
+                unread: isUnread,
+                messageCount: Math.floor(Math.random() * 10) + 1,
+                relatedTo: index % 2 === 0 ? 'application' : 'scout'
+            });
+        });
+        
+        let currentFilter = 'all';
+        let selectedMessageId = null;
+        
+        // メッセージ一覧の表示
+        function displayMessages(filteredMessages = messages) {
+            const container = document.getElementById('messagesList');
+            container.innerHTML = '';
+            
+            if (filteredMessages.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: var(--spacing-xl); text-align: center; color: var(--text-muted);">
+                        メッセージが見つかりませんでした
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredMessages.forEach(msg => {
+                const item = document.createElement('div');
+                item.className = `message-item ${msg.unread ? 'unread' : ''} ${selectedMessageId === msg.id ? 'active' : ''}`;
+                item.onclick = () => selectMessage(msg.id);
+                
+                const timeAgo = getTimeAgo(msg.lastMessageDate);
+                const relatedIcon = msg.relatedTo === 'application' ? '📋' : '📧';
+                
+                item.innerHTML = `
+                    <div class="message-avatar">${msg.doctor.name.substring(0, 1)}</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-name">${msg.doctor.name}</div>
+                            <div class="message-time">${timeAgo}</div>
+                        </div>
+                        <div class="message-subject">${msg.subject}</div>
+                        <div class="message-preview">${msg.preview}</div>
+                        <div class="message-badge">
+                            <span style="font-size: var(--font-size-xs);">${relatedIcon} ${msg.relatedTo === 'application' ? '応募' : 'スカウト'}</span>
+                            ${msg.unread ? '<span class="badge badge-error" style="font-size: var(--font-size-xs);">未読</span>' : ''}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+        
+        // 時間差を表示形式に変換
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'たった今';
+            if (diffMins < 60) return `${diffMins}分前`;
+            if (diffHours < 24) return `${diffHours}時間前`;
+            if (diffDays < 7) return `${diffDays}日前`;
+            
+            return formatDate(date);
+        }
+        
+        // メッセージ選択
+        function selectMessage(messageId) {
+            selectedMessageId = messageId;
+            const message = messages.find(m => m.id === messageId);
+            
+            if (message) {
+                // 未読を既読にする
+                message.unread = false;
+                
+                // メッセージスレッド画面へ遷移
+                window.location.href = `message-thread.html?id=${messageId}`;
+            }
+        }
+        
+        // フィルター
+        function filterMessages(filter) {
+            currentFilter = filter;
+            
+            // タブのアクティブ状態を更新
+            document.querySelectorAll('.message-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.message-tab').classList.add('active');
+            
+            applyFilters();
+        }
+        
+        // 検索
+        function searchMessages() {
+            applyFilters();
+        }
+        
+        // フィルター適用
+        function applyFilters() {
+            let filtered = [...messages];
+            
+            // ステータスフィルター
+            if (currentFilter === 'unread') {
+                filtered = filtered.filter(msg => msg.unread);
+            }
+            
+            // 検索フィルター
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            if (searchQuery) {
+                filtered = filtered.filter(msg => 
+                    msg.doctor.name.toLowerCase().includes(searchQuery) ||
+                    msg.subject.toLowerCase().includes(searchQuery) ||
+                    msg.preview.toLowerCase().includes(searchQuery)
+                );
+            }
+            
+            // 日時順にソート（新しい順）
+            filtered.sort((a, b) => b.lastMessageDate - a.lastMessageDate);
+            
+            displayMessages(filtered);
+        }
+        
+        // 初期化
+        displayMessages();
+    </script>
+</body>
+</html>

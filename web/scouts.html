@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スカウト管理 - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .filter-bar {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .filter-group label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .tab:hover {
+            color: var(--primary-blue);
+            background-color: var(--gray-50);
+        }
+        
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+        
+        .tab .count {
+            background-color: var(--gray-200);
+            color: var(--text-primary);
+            padding: 2px 8px;
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .tab.active .count {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .scout-card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .scout-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-blue);
+        }
+        
+        .scout-card.unread {
+            background-color: #f0f7ff;
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .scout-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+            gap: var(--spacing-md);
+        }
+        
+        .scout-doctor-info {
+            display: flex;
+            gap: var(--spacing-md);
+            flex: 1;
+        }
+        
+        .scout-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .scout-doctor-details {
+            flex: 1;
+        }
+        
+        .scout-doctor-name {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .scout-doctor-specialty {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .scout-doctor-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .scout-status-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: var(--spacing-sm);
+        }
+        
+        .scout-date {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .scout-body {
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .scout-job-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-blue);
+        }
+        
+        .scout-subject {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            font-size: var(--font-size-base);
+        }
+        
+        .scout-message {
+            background-color: var(--gray-50);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-secondary);
+        }
+        
+        .scout-response {
+            background-color: var(--success-light);
+            border-left: 4px solid var(--success);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .scout-response-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        .scout-response-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .scout-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: flex-end;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-4xl) var(--spacing-xl);
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.3;
+        }
+        
+        .empty-state-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .empty-state-text {
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .stat-card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .scout-card-header {
+                flex-direction: column;
+            }
+            
+            .scout-status-section {
+                align-items: flex-start;
+            }
+            
+            .scout-actions {
+                flex-direction: column;
+            }
+            
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                    <span class="badge badge-error" style="margin-left: auto;">12</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                    <span class="badge badge-info" style="margin-left: auto;">5</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">スカウト管理</h1>
+                </div>
+                
+                <div class="header-right">
+                    <button class="btn btn-primary btn-sm" onclick="location.href='doctor-search.html'">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        新規スカウト
+                    </button>
+                    
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <a href="dashboard.html">ホーム</a>
+                        <span class="breadcrumb-separator">›</span>
+                        <span>スカウト管理</span>
+                    </div>
+                    
+                    <div class="content-header-top">
+                        <div>
+                            <h2 class="mb-xs">スカウト管理</h2>
+                            <p class="text-muted mb-0">送信したスカウトを管理・追跡できます</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 統計カード -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalScouts">20</div>
+                        <div class="stat-label">総送信数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="responseRate">35%</div>
+                        <div class="stat-label">返信率</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="positiveResponses">5</div>
+                        <div class="stat-label">興味あり</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="interviewScheduled">2</div>
+                        <div class="stat-label">面接予定</div>
+                    </div>
+                </div>
+                
+                <!-- タブ -->
+                <div class="tabs">
+                    <button class="tab active" onclick="filterByStatus('all')">
+                        すべて
+                        <span class="count" id="countAll">20</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('sent')">
+                        送信済み
+                        <span class="count" id="countSent">10</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('opened')">
+                        既読
+                        <span class="count" id="countOpened">7</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('replied')">
+                        返信あり
+                        <span class="count" id="countReplied">5</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('interested')">
+                        興味あり
+                        <span class="count" id="countInterested">3</span>
+                    </button>
+                    <button class="tab" onclick="filterByStatus('draft')">
+                        下書き
+                        <span class="count" id="countDraft">0</span>
+                    </button>
+                </div>
+                
+                <!-- フィルターバー -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label for="jobFilter">求人</label>
+                        <select class="select" id="jobFilter" onchange="applyFilters()">
+                            <option value="">すべての求人</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="sortFilter">並び替え</label>
+                        <select class="select" id="sortFilter" onchange="applyFilters()">
+                            <option value="date-desc">送信日（新しい順）</option>
+                            <option value="date-asc">送信日（古い順）</option>
+                            <option value="name-asc">氏名（昇順）</option>
+                            <option value="name-desc">氏名（降順）</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group" style="margin-left: auto;">
+                        <div class="input-group">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            <input 
+                                type="text" 
+                                class="input" 
+                                id="searchInput" 
+                                placeholder="医師名で検索"
+                                style="padding-left: 40px;"
+                                oninput="applyFilters()"
+                            >
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- スカウト一覧 -->
+                <div id="scoutsList">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // スカウトデータの生成
+        const scouts = [];
+        const statuses = [
+            { value: 'sent', label: '送信済み', class: 'info' },
+            { value: 'opened', label: '既読', class: 'primary' },
+            { value: 'replied', label: '返信あり', class: 'warning' },
+            { value: 'interested', label: '興味あり', class: 'success' },
+            { value: 'declined', label: '辞退', class: 'gray' }
+        ];
+        
+        // デモスカウトデータを生成（20件）
+        const statusDistribution = [
+            ...Array(3).fill('sent'),
+            ...Array(4).fill('opened'),
+            ...Array(2).fill('replied'),
+            ...Array(3).fill('interested'),
+            ...Array(8).fill('sent')
+        ];
+        
+        const scoutTemplates = [
+            {
+                subject: '【東京総合病院】消化器内科医師のスカウトのご案内',
+                message: '先生のご経歴を拝見し、当院の消化器内科医師のポジションに大変マッチしているのではないかと考え、ご連絡させていただきました。',
+                response: null
+            },
+            {
+                subject: '【急募】内科医師募集のご案内',
+                message: '急なお願いで恐縮ですが、内科医師のポジションが急遽空きまして、早急に先生のようなご経験をお持ちの医師を募集しております。',
+                response: '詳細を伺いたいです。面接日程について相談させていただけますでしょうか。'
+            },
+            {
+                subject: '【スポット勤務】整形外科医師募集',
+                message: 'スポット勤務が可能な整形外科の医師を探しております。ご都合の良い日程で勤務いただけます。',
+                response: null
+            },
+            {
+                subject: '【常勤医師募集】循環器内科',
+                message: '当院では循環器内科の常勤医師を募集しており、先生のご経歴とご専門が当院の求める人材像と合致しておりました。',
+                response: '大変興味があります。ぜひ詳細をお聞かせください。'
+            }
+        ];
+        
+        DEMO_DOCTORS.slice(0, 20).forEach((doctor, index) => {
+            const job = DEMO_JOBS[index % DEMO_JOBS.length];
+            const daysAgo = index; // スカウト送信日（何日前）
+            const sentDate = new Date();
+            sentDate.setDate(sentDate.getDate() - daysAgo);
+            
+            const template = scoutTemplates[index % scoutTemplates.length];
+            const status = statusDistribution[index] || 'sent';
+            
+            scouts.push({
+                id: index + 1,
+                doctor: doctor,
+                job: job,
+                status: status,
+                sentDate: sentDate,
+                subject: template.subject,
+                message: template.message,
+                response: (status === 'replied' || status === 'interested') ? template.response : null,
+                opened: status !== 'sent'
+            });
+        });
+        
+        let currentStatusFilter = 'all';
+        
+        // 求人フィルターの初期化
+        function initJobFilter() {
+            const jobFilter = document.getElementById('jobFilter');
+            const uniqueJobs = [...new Set(DEMO_JOBS.slice(0, 10).map(j => j.title))];
+            
+            uniqueJobs.forEach(jobTitle => {
+                const option = document.createElement('option');
+                option.value = jobTitle;
+                option.textContent = jobTitle;
+                jobFilter.appendChild(option);
+            });
+        }
+        
+        // スカウト一覧の表示
+        function displayScouts(filteredScouts = scouts) {
+            const container = document.getElementById('scoutsList');
+            container.innerHTML = '';
+            
+            if (filteredScouts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📧</div>
+                        <div class="empty-state-title">スカウトがありません</div>
+                        <div class="empty-state-text">条件に一致するスカウトが見つかりませんでした。</div>
+                        <button class="btn btn-primary" onclick="location.href='doctor-search.html'">
+                            新規スカウトを送る
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredScouts.forEach(scout => {
+                const statusInfo = statuses.find(s => s.value === scout.status);
+                const card = document.createElement('div');
+                card.className = `scout-card ${!scout.opened ? 'unread' : ''}`;
+                card.onclick = () => viewScoutDetail(scout.id);
+                
+                const responseHTML = scout.response ? `
+                    <div class="scout-response">
+                        <div class="scout-response-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 11 12 14 22 4"></polyline>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                            ${scout.doctor.name}さんからの返信
+                        </div>
+                        <div class="scout-response-text">${scout.response}</div>
+                    </div>
+                ` : '';
+                
+                card.innerHTML = `
+                    <div class="scout-card-header">
+                        <div class="scout-doctor-info">
+                            <div class="scout-avatar">${scout.doctor.name.substring(0, 1)}</div>
+                            <div class="scout-doctor-details">
+                                <div class="scout-doctor-name">${scout.doctor.name}</div>
+                                <div class="scout-doctor-specialty">${scout.doctor.specialty} / ${scout.doctor.subSpecialty}</div>
+                                <div class="scout-doctor-meta">
+                                    <span>経験${scout.doctor.experience}年</span>
+                                    <span>•</span>
+                                    <span>${scout.doctor.age}歳</span>
+                                    <span>•</span>
+                                    <span>${scout.doctor.preferredLocations[0]}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="scout-status-section">
+                            <span class="badge badge-${statusInfo.class}">${statusInfo.label}</span>
+                            <div class="scout-date">${formatDate(scout.sentDate)}</div>
+                        </div>
+                    </div>
+                    <div class="scout-body">
+                        <div class="scout-job-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 4px;">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            ${scout.job.title}
+                        </div>
+                        <div class="scout-subject">📧 ${scout.subject}</div>
+                        <div class="scout-message">
+                            ${scout.message.substring(0, 100)}${scout.message.length > 100 ? '...' : ''}
+                        </div>
+                        ${responseHTML}
+                        <div class="scout-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-outline btn-sm" onclick="viewDoctorProfile(${scout.doctor.id})">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                プロフィール
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="sendMessage(${scout.id})">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                メッセージ
+                            </button>
+                            ${scout.response ? `
+                                <button class="btn btn-success btn-sm" onclick="scheduleInterview(${scout.id})">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    面接調整
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // ステータス別フィルター
+        function filterByStatus(status) {
+            currentStatusFilter = status;
+            
+            // タブのアクティブ状態を更新
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.tab').classList.add('active');
+            
+            applyFilters();
+        }
+        
+        // フィルター適用
+        function applyFilters() {
+            let filtered = [...scouts];
+            
+            // ステータスフィルター
+            if (currentStatusFilter !== 'all') {
+                if (currentStatusFilter === 'draft') {
+                    filtered = []; // 下書きは別機能で管理
+                } else {
+                    filtered = filtered.filter(scout => scout.status === currentStatusFilter);
+                }
+            }
+            
+            // 求人フィルター
+            const jobFilter = document.getElementById('jobFilter').value;
+            if (jobFilter) {
+                filtered = filtered.filter(scout => scout.job.title === jobFilter);
+            }
+            
+            // 検索フィルター
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            if (searchQuery) {
+                filtered = filtered.filter(scout => 
+                    scout.doctor.name.toLowerCase().includes(searchQuery)
+                );
+            }
+            
+            // 並び替え
+            const sortBy = document.getElementById('sortFilter').value;
+            switch (sortBy) {
+                case 'date-desc':
+                    filtered.sort((a, b) => b.sentDate - a.sentDate);
+                    break;
+                case 'date-asc':
+                    filtered.sort((a, b) => a.sentDate - b.sentDate);
+                    break;
+                case 'name-asc':
+                    filtered.sort((a, b) => a.doctor.name.localeCompare(b.doctor.name));
+                    break;
+                case 'name-desc':
+                    filtered.sort((a, b) => b.doctor.name.localeCompare(a.doctor.name));
+                    break;
+            }
+            
+            displayScouts(filtered);
+        }
+        
+        // カウント更新
+        function updateCounts() {
+            document.getElementById('countAll').textContent = scouts.length;
+            document.getElementById('countSent').textContent = scouts.filter(s => s.status === 'sent').length;
+            document.getElementById('countOpened').textContent = scouts.filter(s => s.status === 'opened').length;
+            document.getElementById('countReplied').textContent = scouts.filter(s => s.status === 'replied').length;
+            document.getElementById('countInterested').textContent = scouts.filter(s => s.status === 'interested').length;
+            document.getElementById('countDraft').textContent = 0;
+            
+            // 統計更新
+            const totalScouts = scouts.length;
+            const responsesCount = scouts.filter(s => s.response).length;
+            const responseRate = totalScouts > 0 ? Math.round((responsesCount / totalScouts) * 100) : 0;
+            const interestedCount = scouts.filter(s => s.status === 'interested').length;
+            
+            document.getElementById('totalScouts').textContent = totalScouts;
+            document.getElementById('responseRate').textContent = `${responseRate}%`;
+            document.getElementById('positiveResponses').textContent = interestedCount;
+            document.getElementById('interviewScheduled').textContent = Math.floor(interestedCount / 2);
+        }
+        
+        // スカウト詳細表示
+        function viewScoutDetail(scoutId) {
+            window.location.href = `scout-detail.html?id=${scoutId}`;
+        }
+        
+        // 医師プロフィール表示
+        function viewDoctorProfile(doctorId) {
+            window.location.href = 'doctor-detail.html';
+        }
+        
+        // メッセージ送信
+        function sendMessage(scoutId) {
+            const scout = scouts.find(s => s.id === scoutId);
+            if (scout) {
+                alert(`💬 ${scout.doctor.name}さんへのメッセージ画面を開きます。\n\n（メッセージ機能は別途実装予定）`);
+            }
+        }
+        
+        // 面接調整
+        function scheduleInterview(scoutId) {
+            const scout = scouts.find(s => s.id === scoutId);
+            if (scout) {
+                alert(`📅 ${scout.doctor.name}さんとの面接日程調整画面を開きます。\n\n（面接調整機能は別途実装予定）`);
+            }
+        }
+        
+        // 初期化
+        initJobFilter();
+        updateCounts();
+        displayScouts();
+    </script>
+</body>
+</html>

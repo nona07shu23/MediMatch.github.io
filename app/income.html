@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>収入管理 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .income-summary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-xl);
+            margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-lg);
+        }
+        
+        .income-summary-label {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .income-summary-value {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .income-summary-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .income-summary-item {
+            text-align: center;
+        }
+        
+        .income-summary-item-value {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .income-summary-item-label {
+            font-size: var(--font-size-xs);
+            opacity: 0.8;
+        }
+        
+        .income-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .income-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .income-card-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .income-card-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .income-card-amount {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-align: right;
+        }
+        
+        .income-card-details {
+            display: grid;
+            gap: var(--spacing-sm);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .income-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-size-sm);
+        }
+        
+        .income-detail-label {
+            color: var(--text-secondary);
+        }
+        
+        .income-detail-value {
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .status-badge.pending {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .status-badge.confirmed {
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+        }
+        
+        .status-badge.paid {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .month-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-white);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .month-selector-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .month-selector-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .month-selector-current {
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+        }
+        
+        .filter-chips-scroll {
+            display: flex;
+            gap: var(--spacing-xs);
+            overflow-x: auto;
+            padding-bottom: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .filter-chips-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .year-selector {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .year-btn {
+            flex: 1;
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .year-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">収入管理</h1>
+            <button class="header-action-btn" onclick="toggleFilterMenu()" aria-label="フィルター">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content">
+            <!-- 収入サマリー -->
+            <div class="income-summary">
+                <div class="income-summary-label">今月の収入</div>
+                <div class="income-summary-value" id="totalIncome">¥240,000</div>
+                <div class="income-summary-details">
+                    <div class="income-summary-item">
+                        <div class="income-summary-item-value" id="pendingIncome">¥80K</div>
+                        <div class="income-summary-item-label">予定</div>
+                    </div>
+                    <div class="income-summary-item">
+                        <div class="income-summary-item-value" id="confirmedIncome">¥100K</div>
+                        <div class="income-summary-item-label">確定</div>
+                    </div>
+                    <div class="income-summary-item">
+                        <div class="income-summary-item-value" id="paidIncome">¥60K</div>
+                        <div class="income-summary-item-label">支払済</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 月選択 -->
+            <div class="month-selector">
+                <button class="month-selector-btn" onclick="previousMonth()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="month-selector-current" id="currentMonth">2026年1月</div>
+                <button class="month-selector-btn" onclick="nextMonth()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- フィルターチップ -->
+            <div class="filter-chips-scroll">
+                <button class="chip active" onclick="filterStatus('all')">すべて</button>
+                <button class="chip" onclick="filterStatus('pending')">予定</button>
+                <button class="chip" onclick="filterStatus('confirmed')">確定</button>
+                <button class="chip" onclick="filterStatus('paid')">支払済</button>
+            </div>
+            
+            <!-- タブ -->
+            <div class="mobile-tabs">
+                <button class="mobile-tab active" onclick="showTab('list')">収入一覧</button>
+                <button class="mobile-tab" onclick="showTab('monthly')">月別</button>
+                <button class="mobile-tab" onclick="showTab('annual')">年間</button>
+            </div>
+            
+            <!-- 収入一覧タブ -->
+            <div id="listTab" class="tab-content">
+                <div class="section">
+                    <div id="incomeList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 月別タブ -->
+            <div id="monthlyTab" class="tab-content" style="display: none;">
+                <div class="section">
+                    <div id="monthlyList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 年間タブ -->
+            <div id="annualTab" class="tab-content" style="display: none;">
+                <div class="section">
+                    <div class="year-selector">
+                        <button class="year-btn" onclick="selectYear(2024)">2024</button>
+                        <button class="year-btn" onclick="selectYear(2025)">2025</button>
+                        <button class="year-btn active" onclick="selectYear(2026)">2026</button>
+                    </div>
+                    
+                    <div class="mobile-card mb-md">
+                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-xs);">年間収入（2026年）</div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--primary-blue); margin-bottom: var(--spacing-md);">¥1,840,000</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md);">
+                            <div>
+                                <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">月平均</div>
+                                <div style="font-size: var(--font-size-lg); font-weight: 600;">¥153,333</div>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">最高月</div>
+                                <div style="font-size: var(--font-size-lg); font-weight: 600;">¥240,000</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="annualList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- クイックアクション -->
+            <div class="section">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm);">
+                    <button class="btn btn-outline" onclick="downloadInvoice()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        請求書
+                    </button>
+                    <button class="btn btn-outline" onclick="exportData()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        エクスポート
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- フィルターメニュー -->
+    <div id="filterMenu" class="action-sheet-overlay" style="display: none;" onclick="toggleFilterMenu()">
+        <div class="action-sheet" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom: var(--spacing-lg);">収入フィルター</h3>
+            
+            <div class="form-group">
+                <label class="form-label">勤務形態</label>
+                <select class="form-control">
+                    <option>すべて</option>
+                    <option>常勤</option>
+                    <option>非常勤</option>
+                    <option>スポット</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">支払い状況</label>
+                <select class="form-control">
+                    <option>すべて</option>
+                    <option>予定</option>
+                    <option>確定</option>
+                    <option>支払済</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">金額範囲</label>
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--spacing-sm); align-items: center;">
+                    <input type="number" class="form-control" placeholder="最低額">
+                    <span>〜</span>
+                    <input type="number" class="form-control" placeholder="最高額">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                <button class="btn btn-outline" style="flex: 1;" onclick="resetFilter()">リセット</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="applyFilter()">適用</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // デモ用収入データ
+        const incomeData = [
+            {
+                id: 1,
+                facilityName: '東京メディカルセンター',
+                jobTitle: '消化器内科医師',
+                workDate: '2026-01-20',
+                employmentType: '非常勤',
+                hours: 8,
+                hourlyRate: 15000,
+                amount: 120000,
+                status: 'confirmed',
+                paymentDate: '2026-02-28'
+            },
+            {
+                id: 2,
+                facilityName: '横浜内科クリニック',
+                jobTitle: '一般内科医師',
+                workDate: '2026-01-15',
+                employmentType: 'スポット',
+                hours: null,
+                hourlyRate: null,
+                amount: 80000,
+                status: 'paid',
+                paymentDate: '2026-01-31'
+            },
+            {
+                id: 3,
+                facilityName: '東京健診クリニック',
+                jobTitle: '健診医師',
+                workDate: '2026-01-25',
+                employmentType: 'スポット',
+                hours: null,
+                hourlyRate: null,
+                amount: 70000,
+                status: 'pending',
+                paymentDate: '2026-02-28'
+            },
+            {
+                id: 4,
+                facilityName: 'ホームケアメディカル',
+                jobTitle: '在宅医療医師',
+                workDate: '2026-01-18',
+                employmentType: '非常勤',
+                hours: 6,
+                hourlyRate: 12000,
+                amount: 72000,
+                status: 'confirmed',
+                paymentDate: '2026-02-28'
+            }
+        ];
+        
+        const monthlyData = [
+            { month: '2025年8月', amount: 80000, count: 3 },
+            { month: '2025年9月', amount: 100000, count: 4 },
+            { month: '2025年10月', amount: 120000, count: 5 },
+            { month: '2025年11月', amount: 160000, count: 6 },
+            { month: '2025年12月', amount: 140000, count: 5 },
+            { month: '2026年1月', amount: 240000, count: 7 }
+        ];
+        
+        // タブ切り替え
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            document.querySelectorAll('.mobile-tab').forEach(tab => tab.classList.remove('active'));
+            
+            if (tabName === 'list') {
+                document.getElementById('listTab').style.display = 'block';
+                document.querySelectorAll('.mobile-tab')[0].classList.add('active');
+                renderIncomeList();
+            } else if (tabName === 'monthly') {
+                document.getElementById('monthlyTab').style.display = 'block';
+                document.querySelectorAll('.mobile-tab')[1].classList.add('active');
+                renderMonthlyList();
+            } else if (tabName === 'annual') {
+                document.getElementById('annualTab').style.display = 'block';
+                document.querySelectorAll('.mobile-tab')[2].classList.add('active');
+                renderAnnualList();
+            }
+        }
+        
+        // 収入一覧を描画
+        function renderIncomeList() {
+            const container = document.getElementById('incomeList');
+            container.innerHTML = incomeData.map(item => {
+                const statusLabels = {
+                    'pending': '予定',
+                    'confirmed': '確定',
+                    'paid': '支払済'
+                };
+                
+                return `
+                    <div class="income-card" onclick="showIncomeDetail(${item.id})">
+                        <div class="income-card-header">
+                            <div>
+                                <div class="income-card-title">${item.facilityName}</div>
+                                <div class="income-card-subtitle">${item.jobTitle}</div>
+                            </div>
+                            <div class="income-card-amount">¥${item.amount.toLocaleString()}</div>
+                        </div>
+                        <div class="income-card-details">
+                            <div class="income-detail-row">
+                                <span class="income-detail-label">勤務日</span>
+                                <span class="income-detail-value">${item.workDate}</span>
+                            </div>
+                            <div class="income-detail-row">
+                                <span class="income-detail-label">勤務形態</span>
+                                <span class="income-detail-value">${item.employmentType}</span>
+                            </div>
+                            ${item.hours ? `
+                            <div class="income-detail-row">
+                                <span class="income-detail-label">勤務時間</span>
+                                <span class="income-detail-value">${item.hours}時間 × ¥${item.hourlyRate.toLocaleString()}</span>
+                            </div>
+                            ` : ''}
+                            <div class="income-detail-row">
+                                <span class="income-detail-label">支払予定日</span>
+                                <span class="income-detail-value">${item.paymentDate}</span>
+                            </div>
+                            <div class="income-detail-row">
+                                <span class="income-detail-label">ステータス</span>
+                                <span class="status-badge ${item.status}">${statusLabels[item.status]}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 月別一覧を描画
+        function renderMonthlyList() {
+            const container = document.getElementById('monthlyList');
+            container.innerHTML = monthlyData.slice().reverse().map(item => `
+                <a href="#" class="list-item">
+                    <div class="list-item-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">${item.month}</div>
+                        <div class="list-item-subtitle">${item.count}件の勤務</div>
+                    </div>
+                    <div class="list-item-content" style="text-align: right;">
+                        <div style="font-size: var(--font-size-lg); font-weight: 700; color: var(--primary-blue);">¥${item.amount.toLocaleString()}</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            `).join('');
+        }
+        
+        // 年間一覧を描画
+        function renderAnnualList() {
+            const container = document.getElementById('annualList');
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const amounts = [240000, 0, 0, 0, 0, 0, 0, 80000, 100000, 120000, 160000, 140000];
+            
+            container.innerHTML = months.map((month, index) => {
+                if (amounts[index] === 0 && index > 0) return '';
+                return `
+                    <a href="#" class="list-item">
+                        <div class="list-item-content">
+                            <div class="list-item-title">${month}</div>
+                        </div>
+                        <div class="list-item-content" style="text-align: right;">
+                            <div style="font-size: var(--font-size-lg); font-weight: 700; color: ${amounts[index] > 0 ? 'var(--primary-blue)' : 'var(--text-muted)'};">
+                                ${amounts[index] > 0 ? '¥' + amounts[index].toLocaleString() : '-'}
+                            </div>
+                        </div>
+                        <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                `;
+            }).join('');
+        }
+        
+        // 月選択
+        function previousMonth() {
+            alert('前月のデータを表示します');
+        }
+        
+        function nextMonth() {
+            alert('次月のデータを表示します');
+        }
+        
+        // フィルター
+        function filterStatus(status) {
+            document.querySelectorAll('.filter-chips-scroll .chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            console.log('Filter by status:', status);
+        }
+        
+        function toggleFilterMenu() {
+            const menu = document.getElementById('filterMenu');
+            menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        function resetFilter() {
+            toggleFilterMenu();
+            alert('フィルターをリセットしました');
+        }
+        
+        function applyFilter() {
+            toggleFilterMenu();
+            alert('フィルターを適用しました');
+        }
+        
+        // 年選択
+        function selectYear(year) {
+            document.querySelectorAll('.year-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            console.log('Selected year:', year);
+        }
+        
+        // 収入詳細表示
+        function showIncomeDetail(id) {
+            alert(`収入ID ${id} の詳細を表示します`);
+        }
+        
+        // ダウンロード・エクスポート
+        function downloadInvoice() {
+            alert('請求書をダウンロードします');
+        }
+        
+        function exportData() {
+            alert('データをエクスポートします');
+        }
+        
+        // 初期化
+        renderIncomeList();
+    </script>
+</body>
+</html>

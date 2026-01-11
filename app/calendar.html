@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>カレンダー - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .calendar-nav-btn {
+            background: none;
+            border: none;
+            padding: var(--spacing-sm);
+            cursor: pointer;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .calendar-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+        }
+        
+        .calendar-view-toggle {
+            display: flex;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .view-toggle-btn {
+            flex: 1;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: var(--bg-light);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .view-toggle-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .calendar-month {
+            padding: var(--spacing-md);
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .calendar-weekday {
+            text-align: center;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: var(--spacing-xs);
+        }
+        
+        .calendar-weekday.sunday {
+            color: var(--error);
+        }
+        
+        .calendar-weekday.saturday {
+            color: var(--primary-blue);
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 4px;
+            background: var(--bg-white);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+        
+        .calendar-day.today {
+            background: var(--very-light-blue);
+        }
+        
+        .calendar-day.selected {
+            background: var(--light-blue-bg);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .day-number {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .day-indicator {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .indicator-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+        }
+        
+        .indicator-dot.work {
+            background: var(--primary-blue);
+        }
+        
+        .indicator-dot.available {
+            background: var(--success);
+        }
+        
+        .indicator-dot.interview {
+            background: var(--warning);
+        }
+        
+        .event-summary {
+            padding: var(--spacing-md);
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            background: var(--bg-light);
+            border-radius: var(--border-radius-md);
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .event-item.available {
+            border-left-color: var(--success);
+        }
+        
+        .event-item.interview {
+            border-left-color: var(--warning);
+        }
+        
+        .event-time {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+        
+        .event-title {
+            font-weight: 500;
+            font-size: var(--font-size-sm);
+        }
+        
+        .event-location {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+        
+        .legend {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-light);
+            font-size: var(--font-size-xs);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        /* 週表示 */
+        .week-view {
+            display: none;
+        }
+        
+        .week-view.active {
+            display: block;
+        }
+        
+        .week-header {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 56px;
+            z-index: 10;
+        }
+        
+        .week-time-label {
+            grid-column: 1;
+        }
+        
+        .week-day-header {
+            text-align: center;
+            padding: var(--spacing-sm);
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .week-day-header.today {
+            background: var(--very-light-blue);
+        }
+        
+        .week-day-name {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .week-day-date {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        
+        .week-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            background: var(--bg-white);
+        }
+        
+        .week-time-column {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .week-time-slot {
+            height: 60px;
+            padding: var(--spacing-xs);
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .week-day-column {
+            position: relative;
+            border-left: 1px solid var(--border-color);
+            min-height: 1440px; /* 24時間 × 60px */
+        }
+        
+        .week-hour-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+        
+        .week-event {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: var(--font-size-xs);
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .week-event.work {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .week-event.available {
+            background: var(--success);
+            color: white;
+        }
+        
+        .week-event.interview {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .week-event-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .week-event-time {
+            opacity: 0.9;
+        }
+        
+        /* リスト表示 */
+        .list-view {
+            display: none;
+            padding: var(--spacing-md);
+        }
+        
+        .list-view.active {
+            display: block;
+        }
+        
+        .list-date-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .list-date-header {
+            position: sticky;
+            top: 56px;
+            background: var(--bg-light);
+            padding: var(--spacing-sm) var(--spacing-md);
+            margin: 0 calc(var(--spacing-md) * -1) var(--spacing-sm);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            z-index: 5;
+        }
+        
+        .list-date-day {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--primary-blue);
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .list-date-info {
+            flex: 1;
+        }
+        
+        .list-date-weekday {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .list-date-full {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        
+        .list-date-badge {
+            padding: 4px 8px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .list-event-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            gap: var(--spacing-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .list-event-card:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .list-event-time-block {
+            text-align: center;
+            min-width: 60px;
+            padding: var(--spacing-xs);
+            border-radius: var(--border-radius-md);
+        }
+        
+        .list-event-time-block.work {
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+        }
+        
+        .list-event-time-block.available {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .list-event-time-block.interview {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .list-event-time {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+        }
+        
+        .list-event-duration {
+            font-size: var(--font-size-xs);
+            margin-top: 2px;
+            opacity: 0.8;
+        }
+        
+        .list-event-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .list-event-title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .list-event-location {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .list-event-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            margin-top: var(--spacing-xs);
+        }
+        
+        .list-event-type.work {
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+        }
+        
+        .list-event-type.available {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .list-event-type.interview {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .list-no-events {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--text-muted);
+        }
+        
+        .list-filter-bar {
+            display: flex;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .list-filter-chip {
+            flex-shrink: 0;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: 20px;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .list-filter-chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .fab-group {
+            position: fixed;
+            bottom: 90px;
+            right: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            z-index: 99;
+        }
+        
+        .fab-mini {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-white);
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .fab-mini:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">カレンダー</h1>
+            <button class="header-action-btn" onclick="toggleCalendarMenu()" aria-label="メニュー">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- カレンダーヘッダー -->
+        <div class="calendar-header">
+            <button class="calendar-nav-btn" onclick="previousMonth()" aria-label="前の月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <div class="calendar-title" id="calendarTitle">2026年1月</div>
+            <button class="calendar-nav-btn" onclick="nextMonth()" aria-label="次の月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- 表示切替 -->
+        <div class="calendar-view-toggle">
+            <button class="view-toggle-btn active" onclick="changeView('month')">月</button>
+            <button class="view-toggle-btn" onclick="changeView('week')">週</button>
+            <button class="view-toggle-btn" onclick="changeView('list')">リスト</button>
+        </div>
+        
+        <!-- 凡例 -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: var(--primary-blue);"></div>
+                <span>勤務予定</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: var(--success);"></div>
+                <span>募集中</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: var(--warning);"></div>
+                <span>面接</span>
+            </div>
+        </div>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content" style="padding: 0; padding-bottom: 100px;">
+            <!-- 月表示 -->
+            <div id="monthView" class="active">
+                <div class="calendar-month">
+                    <div class="calendar-weekdays">
+                        <div class="calendar-weekday sunday">日</div>
+                        <div class="calendar-weekday">月</div>
+                        <div class="calendar-weekday">火</div>
+                        <div class="calendar-weekday">水</div>
+                        <div class="calendar-weekday">木</div>
+                        <div class="calendar-weekday">金</div>
+                        <div class="calendar-weekday saturday">土</div>
+                    </div>
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+                
+                <!-- 選択日のイベント -->
+                <div class="event-summary" id="eventSummary">
+                    <div style="font-weight: 600; margin-bottom: var(--spacing-sm);" id="selectedDate">今日の予定</div>
+                    <div id="eventList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 週表示 -->
+            <div id="weekView" class="week-view">
+                <!-- 週ヘッダー -->
+                <div class="week-header">
+                    <div class="week-time-label"></div>
+                    <div class="week-day-header" id="weekDay0">
+                        <div class="week-day-name">日</div>
+                        <div class="week-day-date">1</div>
+                    </div>
+                    <div class="week-day-header" id="weekDay1">
+                        <div class="week-day-name">月</div>
+                        <div class="week-day-date">2</div>
+                    </div>
+                    <div class="week-day-header" id="weekDay2">
+                        <div class="week-day-name">火</div>
+                        <div class="week-day-date">3</div>
+                    </div>
+                    <div class="week-day-header" id="weekDay3">
+                        <div class="week-day-name">水</div>
+                        <div class="week-day-date">4</div>
+                    </div>
+                    <div class="week-day-header" id="weekDay4">
+                        <div class="week-day-name">木</div>
+                        <div class="week-day-date">5</div>
+                    </div>
+                    <div class="week-day-header" id="weekDay5">
+                        <div class="week-day-name">金</div>
+                        <div class="week-day-date">6</div>
+                    </div>
+                    <div class="week-day-header" id="weekDay6">
+                        <div class="week-day-name">土</div>
+                        <div class="week-day-date">7</div>
+                    </div>
+                </div>
+                
+                <!-- 週グリッド -->
+                <div class="week-grid">
+                    <!-- 時間ラベル列 -->
+                    <div class="week-time-column" id="weekTimeColumn">
+                        <!-- JavaScriptで生成 -->
+                    </div>
+                    
+                    <!-- 曜日列（7日分） -->
+                    <div class="week-day-column" id="weekDayColumn0">
+                        <!-- JavaScriptでイベントを配置 -->
+                    </div>
+                    <div class="week-day-column" id="weekDayColumn1"></div>
+                    <div class="week-day-column" id="weekDayColumn2"></div>
+                    <div class="week-day-column" id="weekDayColumn3"></div>
+                    <div class="week-day-column" id="weekDayColumn4"></div>
+                    <div class="week-day-column" id="weekDayColumn5"></div>
+                    <div class="week-day-column" id="weekDayColumn6"></div>
+                </div>
+            </div>
+            
+            <!-- リスト表示 -->
+            <div id="listView" class="list-view">
+                <!-- フィルターバー -->
+                <div class="list-filter-bar hide-scrollbar" style="margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-md); position: sticky; top: 56px; z-index: 10;">
+                    <button class="list-filter-chip active" onclick="filterListEvents('all')">すべて</button>
+                    <button class="list-filter-chip" onclick="filterListEvents('work')">勤務予定</button>
+                    <button class="list-filter-chip" onclick="filterListEvents('available')">募集中</button>
+                    <button class="list-filter-chip" onclick="filterListEvents('interview')">面接</button>
+                </div>
+                
+                <div id="listContent">
+                    <!-- JavaScriptで生成 -->
+                </div>
+            </div>
+        </main>
+        
+        <!-- FAB（フローティングアクションボタン） -->
+        <div class="fab-group">
+            <button class="fab-mini" onclick="addAvailableTime()" title="空き時間を登録">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </button>
+            <button class="fab" onclick="addEvent()" style="background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- ボトムナビゲーション -->
+        <nav class="bottom-nav">
+            <a href="home.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>ホーム</span>
+            </a>
+            
+            <a href="job-search.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span>求人検索</span>
+            </a>
+            
+            <a href="scouts.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>スカウト</span>
+                <span class="nav-badge">5</span>
+            </a>
+            
+            <a href="messages.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>メッセージ</span>
+                <span class="nav-badge">2</span>
+            </a>
+            
+            <a href="profile.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>マイページ</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- カレンダーメニューモーダル -->
+    <div id="calendarMenu" class="action-sheet-overlay" style="display: none;" onclick="toggleCalendarMenu()">
+        <div class="action-sheet" onclick="event.stopPropagation()">
+            <div class="action-sheet-item" onclick="syncGoogleCalendar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                    <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                    <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                Googleカレンダーと同期
+            </div>
+            <div class="action-sheet-item" onclick="goToToday()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                今日に移動
+            </div>
+            <div class="action-sheet-item" onclick="exportCalendar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                カレンダーをエクスポート
+            </div>
+            <div class="action-sheet-item" onclick="toggleCalendarMenu()" style="border-top: 1px solid var(--border-color); font-weight: 600;">
+                キャンセル
+            </div>
+        </div>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        let currentDate = new Date();
+        let selectedDate = new Date();
+        let currentView = 'month'; // 'month', 'week', 'list'
+        let weekStartDate = new Date();
+        let listFilter = 'all'; // 'all', 'work', 'available', 'interview'
+        
+        // デモ用イベントデータ
+        const events = {
+            '2026-01-15': [
+                { type: 'work', time: '9:00-17:00', startTime: '09:00', endTime: '17:00', title: '東京メディカルセンター', location: '消化器内科' }
+            ],
+            '2026-01-16': [
+                { type: 'available', time: '終日', startTime: '00:00', endTime: '23:59', title: '募集中', location: 'スポット勤務可能' }
+            ],
+            '2026-01-20': [
+                { type: 'interview', time: '14:00-15:00', startTime: '14:00', endTime: '15:00', title: '面接', location: '横浜内科クリニック (オンライン)' }
+            ],
+            '2026-01-22': [
+                { type: 'work', time: '9:00-17:00', startTime: '09:00', endTime: '17:00', title: '東京メディカルセンター', location: '消化器内科' }
+            ],
+            '2026-01-23': [
+                { type: 'available', time: '終日', startTime: '00:00', endTime: '23:59', title: '募集中', location: 'スポット勤務可能' }
+            ],
+            '2026-01-29': [
+                { type: 'work', time: '9:00-17:00', startTime: '09:00', endTime: '17:00', title: '東京メディカルセンター', location: '消化器内科' }
+            ]
+        };
+        
+        // カレンダー描画
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // タイトル更新
+            document.getElementById('calendarTitle').textContent = `${year}年${month + 1}月`;
+            
+            // 月の最初の日と最後の日
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // カレンダーの開始日（前月の日曜日から）
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - startDate.getDay());
+            
+            // カレンダーの終了日（次月の土曜日まで）
+            const endDate = new Date(lastDay);
+            endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
+            
+            // 日付を生成
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                // 日付をコピー（クロージャ問題の回避）
+                const currentDate = new Date(date);
+                
+                const isCurrentMonth = currentDate.getMonth() === month;
+                const isToday = currentDate.getTime() === today.getTime();
+                const isSelected = currentDate.getTime() === selectedDate.getTime();
+                
+                if (!isCurrentMonth) {
+                    dayElement.classList.add('other-month');
+                }
+                if (isToday) {
+                    dayElement.classList.add('today');
+                }
+                if (isSelected) {
+                    dayElement.classList.add('selected');
+                }
+                
+                const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+                const dayEvents = events[dateStr] || [];
+                
+                dayElement.innerHTML = `
+                    <div class="day-number">${currentDate.getDate()}</div>
+                    <div class="day-indicator">
+                        ${dayEvents.map(e => `<div class="indicator-dot ${e.type}"></div>`).join('')}
+                    </div>
+                `;
+                
+                // イベントハンドラーを設定
+                dayElement.addEventListener('click', function() {
+                    selectDate(new Date(currentDate));
+                });
+                
+                daysContainer.appendChild(dayElement);
+            }
+            
+            // 選択日のイベント表示
+            updateEventList();
+        }
+        
+        // 日付選択
+        function selectDate(date) {
+            selectedDate = new Date(date);
+            renderCalendar();
+        }
+        
+        // イベントリスト更新
+        function updateEventList() {
+            const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+            const dayEvents = events[dateStr] || [];
+            
+            document.getElementById('selectedDate').textContent = 
+                `${selectedDate.getMonth() + 1}月${selectedDate.getDate()}日の予定`;
+            
+            const eventList = document.getElementById('eventList');
+            
+            if (dayEvents.length === 0) {
+                eventList.innerHTML = `
+                    <div style="text-align: center; padding: var(--spacing-lg); color: var(--text-muted);">
+                        予定はありません
+                    </div>
+                `;
+                return;
+            }
+            
+            eventList.innerHTML = dayEvents.map(event => `
+                <div class="event-item ${event.type}">
+                    <div style="flex: 1;">
+                        <div class="event-time">${event.time}</div>
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-location">${event.location}</div>
+                    </div>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </div>
+            `).join('');
+        }
+        
+        // 前の月
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+        
+        // 次の月
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+        
+        // 今日に移動
+        function goToToday() {
+            currentDate = new Date();
+            selectedDate = new Date();
+            weekStartDate = new Date();
+            
+            if (currentView === 'week') {
+                renderWeekView();
+            } else {
+                renderCalendar();
+            }
+            toggleCalendarMenu();
+        }
+        
+        // 表示切替
+        function changeView(view) {
+            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentView = view;
+            
+            // ビューの表示/非表示
+            document.getElementById('monthView').style.display = view === 'month' ? 'block' : 'none';
+            document.getElementById('weekView').classList.toggle('active', view === 'week');
+            document.getElementById('listView').classList.toggle('active', view === 'list');
+            
+            if (view === 'week') {
+                renderWeekView();
+            } else if (view === 'list') {
+                renderListView();
+            }
+        }
+        
+        // 週表示を描画
+        function renderWeekView() {
+            // 週の開始日（日曜日）を計算
+            weekStartDate = new Date(currentDate);
+            const day = weekStartDate.getDay();
+            weekStartDate.setDate(weekStartDate.getDate() - day);
+            
+            // タイトル更新
+            const weekEndDate = new Date(weekStartDate);
+            weekEndDate.setDate(weekEndDate.getDate() + 6);
+            
+            const startMonth = weekStartDate.getMonth() + 1;
+            const startDay = weekStartDate.getDate();
+            const endMonth = weekEndDate.getMonth() + 1;
+            const endDay = weekEndDate.getDate();
+            
+            document.getElementById('calendarTitle').textContent = 
+                `${weekStartDate.getFullYear()}年${startMonth}月${startDay}日 - ${endMonth}月${endDay}日`;
+            
+            // 週ヘッダーを更新
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(weekStartDate);
+                date.setDate(date.getDate() + i);
+                
+                const header = document.getElementById(`weekDay${i}`);
+                const dateNum = header.querySelector('.week-day-date');
+                dateNum.textContent = date.getDate();
+                
+                // 今日をハイライト
+                if (date.getTime() === today.getTime()) {
+                    header.classList.add('today');
+                } else {
+                    header.classList.remove('today');
+                }
+            }
+            
+            // 時間ラベルを生成
+            const timeColumn = document.getElementById('weekTimeColumn');
+            timeColumn.innerHTML = '';
+            for (let hour = 0; hour < 24; hour++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'week-time-slot';
+                timeSlot.textContent = `${hour}:00`;
+                timeColumn.appendChild(timeSlot);
+            }
+            
+            // 各日の列に時間線を追加
+            for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+                const column = document.getElementById(`weekDayColumn${dayIndex}`);
+                column.innerHTML = '';
+                
+                // 時間線を追加
+                for (let hour = 0; hour < 24; hour++) {
+                    const line = document.createElement('div');
+                    line.className = 'week-hour-line';
+                    line.style.top = `${hour * 60}px`;
+                    column.appendChild(line);
+                }
+                
+                // イベントを配置
+                const date = new Date(weekStartDate);
+                date.setDate(date.getDate() + dayIndex);
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                const dayEvents = events[dateStr] || [];
+                
+                dayEvents.forEach(event => {
+                    const eventElement = createWeekEvent(event);
+                    column.appendChild(eventElement);
+                });
+            }
+        }
+        
+        // 週表示のイベント要素を作成
+        function createWeekEvent(event) {
+            const element = document.createElement('div');
+            element.className = `week-event ${event.type}`;
+            
+            // 開始時刻と終了時刻から位置とサイズを計算
+            const [startHour, startMin] = event.startTime.split(':').map(Number);
+            const [endHour, endMin] = event.endTime.split(':').map(Number);
+            
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            const duration = endMinutes - startMinutes;
+            
+            element.style.top = `${startMinutes}px`;
+            element.style.height = `${duration}px`;
+            
+            element.innerHTML = `
+                <div class="week-event-title">${event.title}</div>
+                <div class="week-event-time">${event.time}</div>
+            `;
+            
+            element.addEventListener('click', function() {
+                alert(`${event.title}\n${event.time}\n${event.location}`);
+            });
+            
+            return element;
+        }
+        
+        // 週の前後移動を更新
+        function previousMonth() {
+            if (currentView === 'week') {
+                weekStartDate.setDate(weekStartDate.getDate() - 7);
+                currentDate = new Date(weekStartDate);
+                renderWeekView();
+            } else {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            }
+        }
+        
+        function nextMonth() {
+            if (currentView === 'week') {
+                weekStartDate.setDate(weekStartDate.getDate() + 7);
+                currentDate = new Date(weekStartDate);
+                renderWeekView();
+            } else {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            }
+        }
+        
+        // イベント追加
+        function addEvent() {
+            location.href = 'add-event.html';
+        }
+        
+        // 空き時間登録
+        function addAvailableTime() {
+            location.href = 'add-available-time.html';
+        }
+        
+        // カレンダーメニュー
+        function toggleCalendarMenu() {
+            const modal = document.getElementById('calendarMenu');
+            modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        // Googleカレンダー同期
+        function syncGoogleCalendar() {
+            toggleCalendarMenu();
+            alert('Googleカレンダーと同期します');
+        }
+        
+        // エクスポート
+        function exportCalendar() {
+            toggleCalendarMenu();
+            alert('カレンダーをエクスポートします');
+        }
+        
+        // リスト表示を描画
+        function renderListView() {
+            // タイトル更新
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+            document.getElementById('calendarTitle').textContent = `${year}年${month}月`;
+            
+            // イベントを日付順にソート
+            const sortedEvents = [];
+            const startDate = new Date(year, currentDate.getMonth(), 1);
+            const endDate = new Date(year, currentDate.getMonth() + 1, 0);
+            
+            for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                const dayEvents = events[dateStr] || [];
+                
+                if (dayEvents.length > 0) {
+                    sortedEvents.push({
+                        date: new Date(date),
+                        dateStr: dateStr,
+                        events: dayEvents
+                    });
+                }
+            }
+            
+            // リストコンテンツを生成
+            const listContent = document.getElementById('listContent');
+            
+            if (sortedEvents.length === 0) {
+                listContent.innerHTML = `
+                    <div class="list-no-events">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3; margin-bottom: 16px;">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <div style="font-size: var(--font-size-lg); font-weight: 600; margin-bottom: 8px;">予定はありません</div>
+                        <div style="font-size: var(--font-size-sm);">空き時間を登録して、オファーを待ちましょう</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+            
+            listContent.innerHTML = sortedEvents.map(day => {
+                const isToday = day.date.getTime() === today.getTime();
+                const weekday = weekdays[day.date.getDay()];
+                
+                // フィルタリング
+                const filteredEvents = listFilter === 'all' 
+                    ? day.events 
+                    : day.events.filter(e => e.type === listFilter);
+                
+                if (filteredEvents.length === 0) return '';
+                
+                return `
+                    <div class="list-date-group">
+                        <div class="list-date-header">
+                            <div class="list-date-day">${day.date.getDate()}</div>
+                            <div class="list-date-info">
+                                <div class="list-date-weekday">${weekday}曜日</div>
+                                <div class="list-date-full">${year}年${month}月${day.date.getDate()}日</div>
+                            </div>
+                            ${isToday ? '<div class="list-date-badge">今日</div>' : ''}
+                        </div>
+                        ${filteredEvents.map(event => createListEventCard(event)).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // リストのイベントカードを作成
+        function createListEventCard(event) {
+            const typeLabels = {
+                'work': '勤務予定',
+                'available': '募集中',
+                'interview': '面接'
+            };
+            
+            const startTime = event.startTime.substring(0, 5); // "09:00"
+            
+            return `
+                <div class="list-event-card" onclick="showEventDetail('${event.title}', '${event.time}', '${event.location}')">
+                    <div class="list-event-time-block ${event.type}">
+                        <div class="list-event-time">${startTime}</div>
+                        <div class="list-event-duration">${event.time}</div>
+                    </div>
+                    <div class="list-event-content">
+                        <div class="list-event-title">${event.title}</div>
+                        <div class="list-event-location">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            ${event.location}
+                        </div>
+                        <div class="list-event-type ${event.type}">${typeLabels[event.type]}</div>
+                    </div>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </div>
+            `;
+        }
+        
+        // イベント詳細表示
+        function showEventDetail(title, time, location) {
+            alert(`${title}\n${time}\n${location}`);
+        }
+        
+        // リストのフィルター
+        function filterListEvents(filter) {
+            listFilter = filter;
+            
+            // フィルターチップの選択状態を更新
+            document.querySelectorAll('.list-filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // リストを再描画
+            renderListView();
+        }
+        
+        // 前月/次月の更新（リスト対応）
+        const originalPreviousMonth = previousMonth;
+        const originalNextMonth = nextMonth;
+        
+        function previousMonth() {
+            if (currentView === 'list') {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderListView();
+            } else if (currentView === 'week') {
+                weekStartDate.setDate(weekStartDate.getDate() - 7);
+                currentDate = new Date(weekStartDate);
+                renderWeekView();
+            } else {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            }
+        }
+        
+        function nextMonth() {
+            if (currentView === 'list') {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderListView();
+            } else if (currentView === 'week') {
+                weekStartDate.setDate(weekStartDate.getDate() + 7);
+                currentDate = new Date(weekStartDate);
+                renderWeekView();
+            } else {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            }
+        }
+        
+        // 初期化
+        renderCalendar();
+    </script>
+</body>
+</html>

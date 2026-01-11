@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スカウト送信 - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .scout-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .doctor-preview-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--spacing-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+        
+        .doctor-preview-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--border-radius-lg);
+            background-color: white;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            flex-shrink: 0;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .doctor-preview-info {
+            flex: 1;
+        }
+        
+        .doctor-preview-name {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .doctor-preview-specialty {
+            font-size: var(--font-size-base);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .doctor-preview-meta {
+            display: flex;
+            gap: var(--spacing-lg);
+            font-size: var(--font-size-sm);
+        }
+        
+        .form-section {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-section-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .required-badge {
+            background-color: var(--error);
+            color: white;
+            font-size: var(--font-size-xs);
+            padding: 2px 8px;
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+        }
+        
+        .template-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .template-card {
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: white;
+        }
+        
+        .template-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .template-card.selected {
+            border-color: var(--primary-blue);
+            background-color: #f0f7ff;
+        }
+        
+        .template-card-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .template-card-desc {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .job-selector {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+        }
+        
+        .job-option {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .job-option:hover {
+            background-color: var(--gray-50);
+            border-color: var(--primary-blue);
+        }
+        
+        .job-option.selected {
+            background-color: #f0f7ff;
+            border-color: var(--primary-blue);
+        }
+        
+        .job-option input[type="radio"] {
+            margin-top: 2px;
+            cursor: pointer;
+        }
+        
+        .job-option-content {
+            flex: 1;
+        }
+        
+        .job-option-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .job-option-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .char-counter {
+            text-align: right;
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .preview-section {
+            background-color: var(--gray-50);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-md);
+        }
+        
+        .preview-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+        }
+        
+        .preview-content {
+            background-color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+        
+        .action-buttons {
+            position: sticky;
+            bottom: 0;
+            background-color: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+            margin: var(--spacing-xl) calc(var(--spacing-xl) * -1) calc(var(--spacing-xl) * -1);
+        }
+        
+        .info-box {
+            background-color: var(--info-light);
+            border-left: 4px solid var(--info);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .info-box-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--info);
+        }
+        
+        .info-box-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">スカウト送信</h1>
+                </div>
+                
+                <div class="header-right">
+                    <button class="btn btn-outline btn-sm" onclick="history.back()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        戻る
+                    </button>
+                    
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="breadcrumb mb-lg">
+                    <a href="dashboard.html">ホーム</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <a href="doctor-search.html">医師検索</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>スカウト送信</span>
+                </div>
+                
+                <div class="scout-container">
+                    <!-- 送信先医師プレビュー -->
+                    <div class="doctor-preview-card">
+                        <div class="doctor-preview-avatar" id="doctorAvatar">佐</div>
+                        <div class="doctor-preview-info">
+                            <div class="doctor-preview-name" id="doctorName">佐藤健一</div>
+                            <div class="doctor-preview-specialty" id="doctorSpecialty">内科 / 消化器内科</div>
+                            <div class="doctor-preview-meta">
+                                <span id="doctorExperience">経験15年</span>
+                                <span>•</span>
+                                <span id="doctorAge">38歳</span>
+                                <span>•</span>
+                                <span id="doctorLocation">東京都</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- テンプレート選択 -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            テンプレート選択
+                        </h2>
+                        <div class="info-box">
+                            <div class="info-box-title">💡 テンプレートを選択すると自動入力されます</div>
+                            <div class="info-box-text">テンプレートを選択後、自由に編集できます。</div>
+                        </div>
+                        <div class="template-selector">
+                            <div class="template-card" data-template="standard" onclick="selectTemplate('standard')">
+                                <div class="template-card-title">標準テンプレート</div>
+                                <div class="template-card-desc">一般的なスカウトメール</div>
+                            </div>
+                            <div class="template-card" data-template="urgent" onclick="selectTemplate('urgent')">
+                                <div class="template-card-title">急募テンプレート</div>
+                                <div class="template-card-desc">緊急の募集向け</div>
+                            </div>
+                            <div class="template-card" data-template="spot" onclick="selectTemplate('spot')">
+                                <div class="template-card-title">スポット勤務</div>
+                                <div class="template-card-desc">短期・単発勤務向け</div>
+                            </div>
+                            <div class="template-card" data-template="fulltime" onclick="selectTemplate('fulltime')">
+                                <div class="template-card-title">常勤募集</div>
+                                <div class="template-card-desc">常勤医師募集向け</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 求人選択 -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 7h-9M14 17H5M18 12H6"></path>
+                            </svg>
+                            紹介する求人
+                            <span class="required-badge">必須</span>
+                        </h2>
+                        <div class="job-selector" id="jobSelector">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 件名 -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="4" y1="9" x2="20" y2="9"></line>
+                                <line x1="4" y1="15" x2="20" y2="15"></line>
+                                <line x1="10" y1="3" x2="8" y2="21"></line>
+                                <line x1="16" y1="3" x2="14" y2="21"></line>
+                            </svg>
+                            件名
+                            <span class="required-badge">必須</span>
+                        </h2>
+                        <input 
+                            type="text" 
+                            class="input" 
+                            id="subjectInput" 
+                            placeholder="例：【東京総合病院】消化器内科医師のスカウトのご案内"
+                            maxlength="100"
+                            oninput="updateCharCount('subject'); updatePreview();"
+                        >
+                        <div class="char-counter">
+                            <span id="subjectCharCount">0</span> / 100文字
+                        </div>
+                    </div>
+                    
+                    <!-- メッセージ本文 -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            メッセージ本文
+                            <span class="required-badge">必須</span>
+                        </h2>
+                        <textarea 
+                            class="textarea" 
+                            id="messageInput" 
+                            rows="12" 
+                            placeholder="医師へのメッセージを入力してください"
+                            maxlength="2000"
+                            oninput="updateCharCount('message'); updatePreview();"
+                        ></textarea>
+                        <div class="char-counter">
+                            <span id="messageCharCount">0</span> / 2000文字
+                        </div>
+                        
+                        <!-- プレビュー -->
+                        <div class="preview-section">
+                            <div class="preview-label">📧 プレビュー</div>
+                            <div class="preview-content" id="messagePreview">
+                                メッセージを入力すると、ここにプレビューが表示されます。
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- アクションボタン -->
+                    <div class="action-buttons">
+                        <button class="btn btn-outline btn-lg" onclick="saveDraft()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            下書き保存
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="history.back()">
+                            キャンセル
+                        </button>
+                        <button class="btn btn-primary btn-lg" onclick="sendScout()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                            スカウトを送信
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // デモデータ（実際はURLパラメータから取得）
+        const doctor = DEMO_DOCTORS[0];
+        
+        // テンプレート定義
+        const templates = {
+            standard: {
+                subject: '【{{facilityName}}】{{specialty}}医師のスカウトのご案内',
+                message: `{{doctorName}} 先生
+
+はじめまして。
+{{facilityName}}の採用担当です。
+
+先生のご経歴を拝見し、当院の{{jobTitle}}のポジションに大変マッチしているのではないかと考え、ご連絡させていただきました。
+
+【募集内容】
+職種：{{jobTitle}}
+勤務形態：{{employmentType}}
+給与：{{salary}}
+
+ご興味をお持ちいただけましたら、ぜひ詳細をご覧いただき、ご検討いただけますと幸いです。
+
+何かご質問等ございましたら、お気軽にお問い合わせください。
+
+どうぞよろしくお願いいたします。`
+            },
+            urgent: {
+                subject: '【急募】{{specialty}}医師募集のご案内 - {{facilityName}}',
+                message: `{{doctorName}} 先生
+
+{{facilityName}}の採用担当です。
+
+急なお願いで恐縮ですが、{{jobTitle}}のポジションが急遽空きまして、早急に先生のようなご経験をお持ちの医師を募集しております。
+
+【募集内容】
+職種：{{jobTitle}}
+勤務形態：{{employmentType}}
+勤務開始：できるだけ早期
+給与：{{salary}}（条件面は相談可能です）
+
+緊急での募集となりますため、通常よりも柔軟な条件でご相談させていただけます。
+
+ご興味がございましたら、早急にご返信いただけますと幸いです。
+
+よろしくお願いいたします。`
+            },
+            spot: {
+                subject: '【スポット勤務】{{specialty}}医師募集 - {{facilityName}}',
+                message: `{{doctorName}} 先生
+
+{{facilityName}}です。
+
+スポット勤務が可能な{{specialty}}の医師を探しております。
+先生のご経歴を拝見し、ぜひお力をお貸しいただけないかと思い、ご連絡いたしました。
+
+【募集内容】
+職種：{{jobTitle}}
+勤務形態：スポット・短期
+勤務日数：週1日〜応相談
+時給：{{hourlyRate}}円
+
+ご都合の良い日程で勤務いただけますので、ご興味がございましたら詳細をご確認ください。
+
+よろしくお願いいたします。`
+            },
+            fulltime: {
+                subject: '【常勤医師募集】{{specialty}} - {{facilityName}}',
+                message: `{{doctorName}} 先生
+
+{{facilityName}}の採用担当です。
+
+当院では{{specialty}}の常勤医師を募集しており、先生のご経歴とご専門が当院の求める人材像と合致しておりましたので、ご連絡させていただきました。
+
+【募集内容】
+職種：{{jobTitle}}
+勤務形態：常勤
+年収：{{annualSalary}}万円〜（経験・能力により優遇）
+
+【当院の特徴】
+・最新の医療設備
+・充実した福利厚生
+・働きやすい環境づくり
+
+長期的にご活躍いただける環境を整えております。
+ぜひ一度、詳細をご覧いただき、ご検討いただけますと幸いです。
+
+よろしくお願いいたします。`
+            }
+        };
+        
+        // 医師情報を表示
+        function displayDoctorInfo() {
+            document.getElementById('doctorAvatar').textContent = doctor.name.substring(0, 1);
+            document.getElementById('doctorName').textContent = doctor.name;
+            document.getElementById('doctorSpecialty').textContent = `${doctor.specialty} / ${doctor.subSpecialty}`;
+            document.getElementById('doctorExperience').textContent = `経験${doctor.experience}年`;
+            document.getElementById('doctorAge').textContent = `${doctor.age}歳`;
+            document.getElementById('doctorLocation').textContent = doctor.preferredLocations[0];
+        }
+        
+        // 求人リストを表示
+        function displayJobs() {
+            const jobSelector = document.getElementById('jobSelector');
+            DEMO_JOBS.slice(0, 5).forEach((job, index) => {
+                const jobOption = document.createElement('div');
+                jobOption.className = 'job-option';
+                jobOption.onclick = () => selectJob(index);
+                jobOption.innerHTML = `
+                    <input type="radio" name="job" id="job${index}" value="${index}">
+                    <div class="job-option-content">
+                        <div class="job-option-title">${job.title}</div>
+                        <div class="job-option-meta">
+                            <span>${job.specialty}</span>
+                            <span>•</span>
+                            <span>${job.employmentType}</span>
+                            <span>•</span>
+                            <span>${formatSalary(job)}</span>
+                        </div>
+                    </div>
+                `;
+                jobSelector.appendChild(jobOption);
+            });
+        }
+        
+        // 求人選択
+        let selectedJobIndex = null;
+        function selectJob(index) {
+            selectedJobIndex = index;
+            document.getElementById(`job${index}`).checked = true;
+            
+            // 全ての求人オプションから selected クラスを削除
+            document.querySelectorAll('.job-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // 選択された求人にselectedクラスを追加
+            document.querySelectorAll('.job-option')[index].classList.add('selected');
+        }
+        
+        // テンプレート選択
+        let selectedTemplate = null;
+        function selectTemplate(templateName) {
+            selectedTemplate = templateName;
+            
+            // すべてのテンプレートカードからselectedクラスを削除
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 選択されたテンプレートにselectedクラスを追加
+            document.querySelector(`[data-template="${templateName}"]`).classList.add('selected');
+            
+            // テンプレートを適用
+            applyTemplate(templateName);
+        }
+        
+        // テンプレート適用
+        function applyTemplate(templateName) {
+            if (!templates[templateName]) return;
+            
+            const template = templates[templateName];
+            const facilityName = userName || '東京総合病院';
+            
+            // 求人が選択されている場合は求人情報を使用
+            let job = null;
+            if (selectedJobIndex !== null) {
+                job = DEMO_JOBS[selectedJobIndex];
+            } else {
+                // デフォルトの求人を使用
+                job = DEMO_JOBS[0];
+            }
+            
+            // プレースホルダーを置換
+            let subject = template.subject
+                .replace('{{facilityName}}', facilityName)
+                .replace('{{specialty}}', doctor.specialty)
+                .replace('{{jobTitle}}', job.title);
+            
+            let message = template.message
+                .replace(/{{doctorName}}/g, doctor.name)
+                .replace(/{{facilityName}}/g, facilityName)
+                .replace(/{{specialty}}/g, doctor.specialty)
+                .replace(/{{jobTitle}}/g, job.title)
+                .replace(/{{employmentType}}/g, job.employmentType)
+                .replace(/{{salary}}/g, formatSalary(job))
+                .replace(/{{hourlyRate}}/g, job.hourlyRate ? job.hourlyRate.toLocaleString() : '12,000')
+                .replace(/{{annualSalary}}/g, job.annualSalary ? job.annualSalary.toLocaleString() : '1,200');
+            
+            document.getElementById('subjectInput').value = subject;
+            document.getElementById('messageInput').value = message;
+            
+            updateCharCount('subject');
+            updateCharCount('message');
+            updatePreview();
+        }
+        
+        // 文字数カウント更新
+        function updateCharCount(type) {
+            if (type === 'subject') {
+                const count = document.getElementById('subjectInput').value.length;
+                document.getElementById('subjectCharCount').textContent = count;
+            } else if (type === 'message') {
+                const count = document.getElementById('messageInput').value.length;
+                document.getElementById('messageCharCount').textContent = count;
+            }
+        }
+        
+        // プレビュー更新
+        function updatePreview() {
+            const message = document.getElementById('messageInput').value;
+            const preview = document.getElementById('messagePreview');
+            
+            if (message.trim() === '') {
+                preview.textContent = 'メッセージを入力すると、ここにプレビューが表示されます。';
+                preview.style.color = 'var(--text-muted)';
+            } else {
+                preview.textContent = message;
+                preview.style.color = 'var(--text-primary)';
+            }
+        }
+        
+        // スカウト送信
+        function sendScout() {
+            const subject = document.getElementById('subjectInput').value.trim();
+            const message = document.getElementById('messageInput').value.trim();
+            
+            // バリデーション
+            if (selectedJobIndex === null) {
+                alert('❌ 紹介する求人を選択してください。');
+                return;
+            }
+            
+            if (subject === '') {
+                alert('❌ 件名を入力してください。');
+                document.getElementById('subjectInput').focus();
+                return;
+            }
+            
+            if (message === '') {
+                alert('❌ メッセージ本文を入力してください。');
+                document.getElementById('messageInput').focus();
+                return;
+            }
+            
+            // 確認ダイアログ
+            if (confirm(`${doctor.name}さんにスカウトを送信しますか？\n\n件名：${subject}`)) {
+                // 送信処理（デモ）
+                alert('✅ スカウトを送信しました！\n\n医師からの返信をお待ちください。\n送信したスカウトは「スカウト管理」画面で確認できます。');
+                
+                // スカウト管理画面へ遷移
+                window.location.href = 'scouts.html';
+            }
+        }
+        
+        // 下書き保存
+        function saveDraft() {
+            const subject = document.getElementById('subjectInput').value.trim();
+            const message = document.getElementById('messageInput').value.trim();
+            
+            if (subject === '' && message === '') {
+                alert('❌ 件名またはメッセージを入力してください。');
+                return;
+            }
+            
+            // 下書き保存処理（デモ）
+            alert('💾 下書きを保存しました。\n\n「スカウト管理」の下書きフォルダから編集を再開できます。');
+            
+            // 前の画面に戻る
+            history.back();
+        }
+        
+        // 初期化
+        displayDoctorInfo();
+        displayJobs();
+    </script>
+</body>
+</html>

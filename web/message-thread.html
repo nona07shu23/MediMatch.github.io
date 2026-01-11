@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メッセージ - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .thread-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 0;
+            height: calc(100vh - 140px);
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+        }
+        
+        .thread-sidebar {
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-white);
+        }
+        
+        .thread-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .thread-header h2 {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .message-item {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: flex-start;
+        }
+        
+        .message-item:hover {
+            background-color: var(--gray-50);
+        }
+        
+        .message-item.active {
+            background-color: #f0f7ff;
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .thread-main {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-white);
+        }
+        
+        .thread-top-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            background-color: var(--bg-white);
+        }
+        
+        .thread-doctor-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .thread-doctor-info {
+            flex: 1;
+        }
+        
+        .thread-doctor-name {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .thread-doctor-specialty {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        
+        .thread-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-xl);
+            background-color: var(--gray-50);
+        }
+        
+        .chat-message {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .chat-message.sent {
+            flex-direction: row-reverse;
+        }
+        
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.sent .chat-avatar {
+            background: linear-gradient(135deg, var(--success), var(--info));
+        }
+        
+        .chat-content {
+            max-width: 65%;
+        }
+        
+        .chat-bubble {
+            background-color: white;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .chat-message.sent .chat-bubble {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .chat-text {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .chat-meta {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            padding: 0 var(--spacing-sm);
+        }
+        
+        .chat-message.sent .chat-meta {
+            text-align: right;
+        }
+        
+        .thread-input-area {
+            padding: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-white);
+        }
+        
+        .input-toolbar {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .toolbar-btn {
+            padding: var(--spacing-sm);
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+        
+        .toolbar-btn:hover {
+            background-color: var(--gray-50);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        
+        .message-input-wrapper {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            resize: none;
+            font-family: inherit;
+            font-size: var(--font-size-base);
+            min-height: 80px;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px var(--primary-blue-light);
+        }
+        
+        .thread-sidebar-right {
+            border-left: 1px solid var(--border-color);
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+            background-color: var(--bg-white);
+        }
+        
+        .sidebar-section {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .sidebar-section-title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+        
+        .info-card {
+            background-color: var(--gray-50);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .info-card-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            font-size: var(--font-size-sm);
+        }
+        
+        .info-card-text {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+        
+        .quick-action-btn {
+            width: 100%;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        @media (max-width: 1200px) {
+            .thread-layout {
+                grid-template-columns: 300px 1fr;
+            }
+            
+            .thread-sidebar-right {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .thread-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .thread-sidebar {
+                display: none;
+            }
+            
+            .chat-content {
+                max-width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                    <span class="badge badge-error" style="margin-left: auto;">12</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">メッセージ</h1>
+                </div>
+                
+                <div class="header-right">
+                    <button class="btn btn-outline btn-sm" onclick="location.href='messages.html'">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        一覧に戻る
+                    </button>
+                    
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="breadcrumb mb-lg">
+                    <a href="dashboard.html">ホーム</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <a href="messages.html">メッセージ</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span id="breadcrumbDoctor">佐藤健一</span>
+                </div>
+                
+                <!-- スレッドレイアウト -->
+                <div class="thread-layout">
+                    <!-- 左サイドバー（メッセージリスト） -->
+                    <div class="thread-sidebar">
+                        <div class="thread-header">
+                            <h2>メッセージ</h2>
+                        </div>
+                        
+                        <div class="messages-list" id="messagesList">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- メインエリア -->
+                    <div class="thread-main">
+                        <!-- スレッドヘッダー -->
+                        <div class="thread-top-header">
+                            <div class="thread-doctor-avatar" id="doctorAvatar">佐</div>
+                            <div class="thread-doctor-info">
+                                <div class="thread-doctor-name" id="doctorName">佐藤健一</div>
+                                <div class="thread-doctor-specialty" id="doctorSpecialty">内科 / 消化器内科</div>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="viewDoctorProfile()">
+                                プロフィール
+                            </button>
+                        </div>
+                        
+                        <!-- メッセージスレッド -->
+                        <div class="thread-messages" id="threadMessages">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                        
+                        <!-- 入力エリア -->
+                        <div class="thread-input-area">
+                            <div class="input-toolbar">
+                                <button class="toolbar-btn" title="ファイル添付" onclick="attachFile()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                                    </svg>
+                                </button>
+                                <button class="toolbar-btn" title="テンプレート" onclick="useTemplate()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="message-input-wrapper">
+                                <textarea 
+                                    class="message-input" 
+                                    id="messageInput" 
+                                    placeholder="メッセージを入力..."
+                                    onkeydown="handleKeyDown(event)"
+                                ></textarea>
+                                <button class="btn btn-primary" style="align-self: flex-end;" onclick="sendMessage()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                    送信
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右サイドバー（情報） -->
+                    <div class="thread-sidebar-right">
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">関連情報</div>
+                            <div class="info-card">
+                                <div class="info-card-title">📋 応募求人</div>
+                                <div class="info-card-text" id="relatedJob">消化器内科医師（常勤）</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">📅 ステータス</div>
+                                <div class="info-card-text">
+                                    <span class="badge badge-info">面接調整中</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">クイックアクション</div>
+                            <button class="btn btn-outline btn-sm quick-action-btn" onclick="scheduleInterview()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                面接日程調整
+                            </button>
+                            <button class="btn btn-outline btn-sm quick-action-btn" onclick="viewApplication()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                応募詳細を見る
+                            </button>
+                            <button class="btn btn-outline btn-sm quick-action-btn" onclick="viewDoctorProfile()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                プロフィールを見る
+                            </button>
+                        </div>
+                        
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">医師情報</div>
+                            <div class="info-card">
+                                <div class="info-card-text">
+                                    <strong>経験年数：</strong><span id="doctorExperience">15年</span><br>
+                                    <strong>専門：</strong><span id="doctorSubSpecialty">消化器内科</span><br>
+                                    <strong>希望地域：</strong><span id="doctorLocation">東京都</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // デモデータ
+        const doctor = DEMO_DOCTORS[0];
+        const job = DEMO_JOBS[0];
+        
+        // 医師情報を表示
+        function displayDoctorInfo() {
+            document.getElementById('breadcrumbDoctor').textContent = doctor.name;
+            document.getElementById('doctorAvatar').textContent = doctor.name.substring(0, 1);
+            document.getElementById('doctorName').textContent = doctor.name;
+            document.getElementById('doctorSpecialty').textContent = `${doctor.specialty} / ${doctor.subSpecialty}`;
+            document.getElementById('relatedJob').textContent = job.title;
+            document.getElementById('doctorExperience').textContent = `${doctor.experience}年`;
+            document.getElementById('doctorSubSpecialty').textContent = doctor.subSpecialty;
+            document.getElementById('doctorLocation').textContent = doctor.preferredLocations[0];
+        }
+        
+        // 会話データを生成
+        const chatMessages = [
+            {
+                sender: 'doctor',
+                text: 'こんにちは。先日スカウトをいただきました佐藤と申します。\n貴院の求人に大変興味があります。',
+                time: new Date(Date.now() - 3600000 * 24 * 2) // 2日前
+            },
+            {
+                sender: 'facility',
+                text: '佐藤先生、ご連絡ありがとうございます。\n当院の求人にご興味をお持ちいただき、嬉しく思います。\n\nまずは一度面接の機会を設けさせていただけますでしょうか？',
+                time: new Date(Date.now() - 3600000 * 24 * 2 + 3600000) // 2日前+1時間
+            },
+            {
+                sender: 'doctor',
+                text: 'ありがとうございます。ぜひお願いいたします。\n\n来週でしたら、火曜日の14時以降か、木曜日の午前中でしたら都合がつきます。いかがでしょうか？',
+                time: new Date(Date.now() - 3600000 * 24 + 3600000 * 2) // 1日前+2時間
+            },
+            {
+                sender: 'facility',
+                text: 'ご希望をお伝えいただきありがとうございます。\n\n来週火曜日の14時30分から、当院にて面接を実施させていただければと存じます。\n所要時間は1時間程度を予定しております。\n\nご都合はいかがでしょうか？',
+                time: new Date(Date.now() - 3600000 * 18) // 18時間前
+            },
+            {
+                sender: 'doctor',
+                text: '火曜日14時30分で問題ございません。\nよろしくお願いいたします。\n\n当日の持ち物や、事前に準備しておくことはございますか？',
+                time: new Date(Date.now() - 3600000 * 12) // 12時間前
+            }
+        ];
+        
+        // メッセージスレッドを表示
+        function displayThread() {
+            const container = document.getElementById('threadMessages');
+            container.innerHTML = '';
+            
+            chatMessages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${msg.sender === 'facility' ? 'sent' : ''}`;
+                
+                const avatarLetter = msg.sender === 'facility' ? userName.substring(0, 1) : doctor.name.substring(0, 1);
+                const timeStr = formatDateTime(msg.time);
+                
+                messageDiv.innerHTML = `
+                    <div class="chat-avatar">${avatarLetter}</div>
+                    <div class="chat-content">
+                        <div class="chat-bubble">
+                            <div class="chat-text">${msg.text}</div>
+                        </div>
+                        <div class="chat-meta">${timeStr}</div>
+                    </div>
+                `;
+                
+                container.appendChild(messageDiv);
+            });
+            
+            // スクロールを最下部に
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // 日時フォーマット
+        function formatDateTime(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'たった今';
+            if (diffMins < 60) return `${diffMins}分前`;
+            if (diffHours < 24) return `${diffHours}時間前`;
+            if (diffDays < 7) {
+                const hours = date.getHours();
+                const mins = String(date.getMinutes()).padStart(2, '0');
+                return `${diffDays}日前 ${hours}:${mins}`;
+            }
+            
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const hours = date.getHours();
+            const mins = String(date.getMinutes()).padStart(2, '0');
+            return `${month}月${day}日 ${hours}:${mins}`;
+        }
+        
+        // メッセージ送信
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (text === '') {
+                alert('メッセージを入力してください。');
+                return;
+            }
+            
+            // メッセージを追加
+            chatMessages.push({
+                sender: 'facility',
+                text: text,
+                time: new Date()
+            });
+            
+            // 表示を更新
+            displayThread();
+            
+            // 入力をクリア
+            input.value = '';
+            
+            // 成功メッセージ
+            // alert('✅ メッセージを送信しました。');
+        }
+        
+        // Enterキーで送信（Shift+Enterで改行）
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        // ファイル添付
+        function attachFile() {
+            alert('📎 ファイル添付機能\n\n履歴書や資料を添付できます。\n（デモ機能）');
+        }
+        
+        // テンプレート使用
+        function useTemplate() {
+            const templates = [
+                '面接日程のご提案をさせていただきます。',
+                'ご質問ありがとうございます。詳細をご説明いたします。',
+                '選考結果についてご連絡させていただきます。'
+            ];
+            
+            const template = templates[Math.floor(Math.random() * templates.length)];
+            document.getElementById('messageInput').value = template;
+        }
+        
+        // 面接日程調整
+        function scheduleInterview() {
+            alert('📅 面接日程調整\n\n候補日を提案して医師と調整できます。\n（別途実装予定）');
+        }
+        
+        // 応募詳細
+        function viewApplication() {
+            window.location.href = 'application-detail.html';
+        }
+        
+        // プロフィール表示
+        function viewDoctorProfile() {
+            window.location.href = 'doctor-detail.html';
+        }
+        
+        // 左サイドバーのメッセージリスト表示（簡易版）
+        function displayMessagesList() {
+            const container = document.getElementById('messagesList');
+            const doctors = DEMO_DOCTORS.slice(0, 5);
+            
+            doctors.forEach((doc, index) => {
+                const item = document.createElement('div');
+                item.className = `message-item ${index === 0 ? 'active' : ''}`;
+                item.onclick = () => {
+                    alert(`${doc.name}さんとのメッセージスレッドを開きます。`);
+                };
+                
+                item.innerHTML = `
+                    <div class="message-avatar">${doc.name.substring(0, 1)}</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${doc.name}</div>
+                        <div style="font-size: var(--font-size-xs); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${index === 0 ? '当日の持ち物や、事前に準備して...' : 'メッセージのプレビューテキスト...'}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+        
+        // 初期化
+        displayDoctorInfo();
+        displayThread();
+        displayMessagesList();
+    </script>
+</body>
+</html>

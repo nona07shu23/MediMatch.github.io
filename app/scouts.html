@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>スカウト - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <h1 class="header-title">スカウト</h1>
+            <button class="header-action-btn" onclick="location.href='scout-settings.html'" aria-label="設定">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m0-18l-4 4m4-4l4 4M1 12h6m6 0h6m-18 0l4-4m-4 4l4 4m18-4l-4-4m4 4l-4 4"></path>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content">
+            <!-- タブ -->
+            <div class="mobile-tabs">
+                <button class="mobile-tab active" onclick="showTab('new')">新着 <span class="nav-badge" style="position: static; margin-left: 4px;">5</span></button>
+                <button class="mobile-tab" onclick="showTab('interested')">興味あり</button>
+                <button class="mobile-tab" onclick="showTab('history')">履歴</button>
+            </div>
+            
+            <!-- 新着スカウト -->
+            <div id="newTab" class="tab-content">
+                <div class="mb-md">
+                    <span class="fw-semibold" id="newCount">5</span> 件の新着スカウト
+                </div>
+                
+                <div id="scoutList">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+            </div>
+            
+            <!-- 興味ありスカウト -->
+            <div id="interestedTab" class="tab-content" style="display: none;">
+                <div class="mb-md">
+                    <span class="fw-semibold">3</span> 件のスカウト
+                </div>
+                
+                <div id="interestedList">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+            </div>
+            
+            <!-- 履歴 -->
+            <div id="historyTab" class="tab-content" style="display: none;">
+                <div class="mb-md">
+                    <span class="fw-semibold">12</span> 件の履歴
+                </div>
+                
+                <div id="historyList">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+            </div>
+        </main>
+        
+        <!-- ボトムナビゲーション -->
+        <nav class="bottom-nav">
+            <a href="home.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>ホーム</span>
+            </a>
+            
+            <a href="job-search.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span>求人検索</span>
+            </a>
+            
+            <a href="scouts.html" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>スカウト</span>
+                <span class="nav-badge">5</span>
+            </a>
+            
+            <a href="messages.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>メッセージ</span>
+                <span class="nav-badge">2</span>
+            </a>
+            
+            <a href="profile.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>マイページ</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // デモ用スカウトデータ
+        const scouts = [
+            {
+                id: 1,
+                facilityType: '総合病院',
+                facilityName: '東京メディカルセンター',
+                jobTitle: '消化器内科医師',
+                specialty: '消化器内科',
+                salaryType: 'hourly',
+                salaryMin: 15000,
+                salaryMax: 15000,
+                employmentType: '非常勤',
+                location: '東京都渋谷区',
+                workDays: '週1-2日',
+                onCallRequired: false,
+                matchScore: 95,
+                isNew: true,
+                receivedAt: '2日前'
+            },
+            {
+                id: 2,
+                facilityType: 'クリニック',
+                facilityName: '横浜内科クリニック',
+                jobTitle: '一般内科医師',
+                specialty: '内科',
+                salaryType: 'daily',
+                salaryMin: 80000,
+                salaryMax: 80000,
+                employmentType: 'スポット',
+                location: '神奈川県横浜市',
+                workDays: '土曜日のみ',
+                onCallRequired: false,
+                matchScore: 88,
+                isNew: true,
+                receivedAt: '3日前'
+            },
+            {
+                id: 3,
+                facilityType: '訪問診療',
+                facilityName: 'ホームケアメディカル',
+                jobTitle: '在宅医療医師',
+                specialty: '総合診療科',
+                salaryType: 'hourly',
+                salaryMin: 12000,
+                salaryMax: 12000,
+                employmentType: '非常勤',
+                location: '東京都世田谷区',
+                workDays: '週1-3日',
+                onCallRequired: true,
+                matchScore: 82,
+                isNew: true,
+                receivedAt: '1週間前'
+            },
+            {
+                id: 4,
+                facilityType: '健診センター',
+                facilityName: '東京健診クリニック',
+                jobTitle: '健診医師',
+                specialty: '内科',
+                salaryType: 'daily',
+                salaryMin: 70000,
+                salaryMax: 70000,
+                employmentType: 'スポット',
+                location: '東京都千代田区',
+                workDays: '平日のみ',
+                onCallRequired: false,
+                matchScore: 90,
+                isNew: false,
+                receivedAt: '2週間前'
+            },
+            {
+                id: 5,
+                facilityType: '介護施設',
+                facilityName: 'シニアライフ湘南',
+                jobTitle: '施設医師',
+                specialty: '内科',
+                salaryType: 'hourly',
+                salaryMin: 13000,
+                salaryMax: 13000,
+                employmentType: '非常勤',
+                location: '神奈川県藤沢市',
+                workDays: '週1日',
+                onCallRequired: false,
+                matchScore: 85,
+                isNew: false,
+                receivedAt: '3週間前'
+            }
+        ];
+        
+        // タブ切り替え
+        function showTab(tabName) {
+            // すべてのタブコンテンツを非表示
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // すべてのタブボタンを非アクティブ化
+            document.querySelectorAll('.mobile-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 選択されたタブを表示
+            if (tabName === 'new') {
+                document.getElementById('newTab').style.display = 'block';
+                document.querySelectorAll('.mobile-tab')[0].classList.add('active');
+            } else if (tabName === 'interested') {
+                document.getElementById('interestedTab').style.display = 'block';
+                document.querySelectorAll('.mobile-tab')[1].classList.add('active');
+            } else if (tabName === 'history') {
+                document.getElementById('historyTab').style.display = 'block';
+                document.querySelectorAll('.mobile-tab')[2].classList.add('active');
+            }
+        }
+        
+        // スカウト一覧を表示
+        function displayScouts(scouts, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (scouts.length === 0) {
+                container.innerHTML = `
+                    <div class="mobile-empty-state">
+                        <svg class="mobile-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <div class="mobile-empty-title">スカウトはありません</div>
+                        <div class="mobile-empty-description">プロフィールを充実させるとスカウトが届きやすくなります</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            scouts.forEach(scout => {
+                const item = document.createElement('a');
+                item.href = `scout-detail.html?id=${scout.id}`;
+                item.className = 'list-item';
+                
+                const iconBg = scout.isNew ? 
+                    'background: linear-gradient(135deg, var(--success), #4caf50);' :
+                    'background-color: var(--light-blue-bg);';
+                
+                const iconColor = scout.isNew ? 'color: white;' : 'color: var(--primary-blue);';
+                
+                item.innerHTML = `
+                    <div class="list-item-icon" style="${iconBg} ${iconColor} font-size: var(--font-size-lg); font-weight: 600;">
+                        ${scout.matchScore}%
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">
+                            ${scout.jobTitle}
+                            ${scout.isNew ? '<span class="badge" style="background-color: var(--success); color: white; margin-left: 8px;">NEW</span>' : ''}
+                        </div>
+                        <div class="list-item-subtitle">${scout.facilityName} · ${scout.location}</div>
+                        <div class="list-item-meta">
+                            <span class="badge badge-primary">${scout.specialty}</span>
+                            <span class="badge badge-gray">${scout.employmentType}</span>
+                            ${scout.onCallRequired ? '<span class="badge badge-warning">当直あり</span>' : ''}
+                        </div>
+                        <div class="list-item-meta mt-xs">
+                            <span class="text-primary fw-semibold">${formatSalary(scout.salaryType, scout.salaryMin, scout.salaryMax)}</span>
+                            <span class="text-muted">·</span>
+                            <span class="text-muted">${scout.receivedAt}</span>
+                        </div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // 新着スカウトを表示
+        function displayNewScouts() {
+            const newScouts = scouts.filter(s => s.isNew);
+            displayScouts(newScouts, 'scoutList');
+            document.getElementById('newCount').textContent = newScouts.length;
+        }
+        
+        // 興味ありスカウトを表示（デモ用にランダムに3件）
+        function displayInterestedScouts() {
+            const interestedScouts = scouts.slice(0, 3);
+            displayScouts(interestedScouts, 'interestedList');
+        }
+        
+        // 履歴を表示（デモ用に全件）
+        function displayHistoryScouts() {
+            displayScouts(scouts, 'historyList');
+        }
+        
+        // 初期化
+        displayNewScouts();
+        displayInterestedScouts();
+        displayHistoryScouts();
+    </script>
+</body>
+</html>

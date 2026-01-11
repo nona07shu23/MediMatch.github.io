@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>求人詳細 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <div style="display: flex; gap: var(--spacing-sm);">
+                <button class="header-action-btn" onclick="toggleBookmark()" id="bookmarkBtn" aria-label="お気に入り">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </button>
+                <button class="header-action-btn" onclick="shareJob()" aria-label="シェア">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content no-padding" id="main-content">
+            <!-- 施設ヘッダー -->
+            <div style="background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); padding: var(--spacing-xl) var(--spacing-md); color: white;">
+                <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                    <div style="width: 60px; height: 60px; background-color: white; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary-blue); font-size: var(--font-size-xl);" id="facilityInitial">
+                        東
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9; margin-bottom: var(--spacing-xs);" id="facilityType">総合病院</div>
+                        <div style="font-size: var(--font-size-xl); font-weight: 600;" id="facilityName">東京総合病院</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: var(--spacing-sm); align-items: center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span id="location">東京都港区</span>
+                </div>
+            </div>
+            
+            <!-- 求人情報 -->
+            <div style="padding: var(--spacing-md);">
+                <div class="mobile-card">
+                    <h1 style="font-size: var(--font-size-xl); font-weight: 600; margin-bottom: var(--spacing-md);" id="jobTitle">内科医師（常勤）募集</h1>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);" id="badges">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-md); background-color: var(--light-blue-bg); border-radius: var(--border-radius-md); margin-bottom: var(--spacing-md);">
+                        <div>
+                            <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">提示給与</div>
+                            <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--primary-blue);" id="salary">
+                                年収 1,200万円 〜 1,800万円
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-md) 0; border-top: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <span class="text-muted" style="font-size: var(--font-size-sm);">閲覧数</span>
+                        </div>
+                        <span class="fw-semibold" id="views">156</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-md) 0; border-top: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                            </svg>
+                            <span class="text-muted" style="font-size: var(--font-size-sm);">応募者数</span>
+                        </div>
+                        <span class="fw-semibold text-primary" id="applications">8</span>
+                    </div>
+                </div>
+                
+                <!-- 募集要項 -->
+                <div class="mobile-card">
+                    <h2 style="font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--spacing-md);">募集要項</h2>
+                    
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">勤務形態</div>
+                        <div id="employmentType">常勤</div>
+                    </div>
+                    
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">診療科</div>
+                        <div id="specialty">内科</div>
+                    </div>
+                    
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">勤務日数</div>
+                        <div id="workDays">週5日（月〜金）</div>
+                    </div>
+                    
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">当直</div>
+                        <div id="onCall">あり</div>
+                    </div>
+                    
+                    <div>
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">待遇・福利厚生</div>
+                        <div id="benefits">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 仕事内容 -->
+                <div class="mobile-card">
+                    <h2 style="font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--spacing-md);">仕事内容</h2>
+                    <p id="description" style="line-height: 1.7; margin: 0;">
+                        総合内科の常勤医師を募集しています。外来・病棟管理をお願いします。
+                    </p>
+                </div>
+                
+                <!-- 施設情報 -->
+                <div class="mobile-card">
+                    <h2 style="font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--spacing-md);">施設情報</h2>
+                    
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">施設名</div>
+                        <div id="facilityNameDetail">東京総合病院</div>
+                    </div>
+                    
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">所在地</div>
+                        <div id="address">東京都港区六本木1-1-1</div>
+                    </div>
+                    
+                    <div>
+                        <div style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-xs);">アクセス</div>
+                        <div>東京メトロ日比谷線 六本木駅 徒歩3分</div>
+                    </div>
+                </div>
+                
+                <!-- 掲載情報 -->
+                <div style="text-align: center; color: var(--text-muted); font-size: var(--font-size-sm); margin: var(--spacing-xl) 0;">
+                    <div>掲載日: <span id="postedDate">2026年1月5日</span></div>
+                    <div style="margin-top: var(--spacing-xs);">求人ID: <span id="jobId">job001</span></div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 応募ボタン（固定） -->
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; padding: var(--spacing-md); background-color: var(--bg-white); border-top: 1px solid var(--border-color); box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);">
+            <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="applyJob()">
+                この求人に応募する
+            </button>
+        </div>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // URLパラメータから求人IDを取得（実際は最初の求人を表示）
+        const job = DEMO_JOBS[0];
+        
+        // 求人詳細を表示
+        function displayJobDetail() {
+            document.getElementById('facilityInitial').textContent = job.facilityName.substring(0, 1);
+            document.getElementById('facilityType').textContent = job.facilityType;
+            document.getElementById('facilityName').textContent = job.facilityName;
+            document.getElementById('location').textContent = job.location;
+            document.getElementById('jobTitle').textContent = job.title;
+            document.getElementById('salary').textContent = formatSalary(job.salaryType, job.salaryMin, job.salaryMax);
+            document.getElementById('views').textContent = job.views;
+            document.getElementById('applications').textContent = job.applications;
+            document.getElementById('employmentType').textContent = job.employmentType;
+            document.getElementById('specialty').textContent = job.specialty;
+            document.getElementById('workDays').textContent = job.workDays;
+            document.getElementById('onCall').textContent = job.onCallRequired ? 'あり' : 'なし';
+            document.getElementById('description').textContent = job.description;
+            document.getElementById('facilityNameDetail').textContent = job.facilityName;
+            document.getElementById('address').textContent = job.location;
+            document.getElementById('postedDate').textContent = formatDate(job.postedDate);
+            document.getElementById('jobId').textContent = job.id;
+            
+            // バッジ表示
+            const badgesContainer = document.getElementById('badges');
+            badgesContainer.innerHTML = `
+                <span class="badge badge-primary">${job.specialty}</span>
+                <span class="badge badge-gray">${job.employmentType}</span>
+                ${job.onCallRequired ? '<span class="badge badge-warning">当直あり</span>' : '<span class="badge badge-success">当直なし</span>'}
+                <span class="badge badge-info">新着</span>
+            `;
+            
+            // 福利厚生表示
+            const benefitsContainer = document.getElementById('benefits');
+            benefitsContainer.innerHTML = job.benefits.map(benefit => 
+                `<div style="display: flex; align-items: center; gap: var(--spacing-xs); margin-bottom: var(--spacing-xs);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    ${benefit}
+                </div>`
+            ).join('');
+        }
+        
+        // お気に入り切り替え
+        function toggleBookmark() {
+            const btn = document.getElementById('bookmarkBtn');
+            const svg = btn.querySelector('svg');
+            
+            if (svg.getAttribute('fill') === 'currentColor') {
+                svg.setAttribute('fill', 'none');
+                alert('お気に入りから削除しました');
+            } else {
+                svg.setAttribute('fill', 'currentColor');
+                alert('お気に入りに追加しました');
+            }
+        }
+        
+        // シェア
+        function shareJob() {
+            if (navigator.share) {
+                navigator.share({
+                    title: job.title,
+                    text: `${job.facilityName} - ${job.title}`,
+                    url: window.location.href
+                }).catch(err => console.log('Share failed:', err));
+            } else {
+                alert('この求人をシェア（URL: ' + window.location.href + '）');
+            }
+        }
+        
+        // 応募
+        function applyJob() {
+            if (confirm('この求人に応募しますか？\n\n応募後、医療機関とメッセージでやり取りができます。')) {
+                alert('応募が完了しました！\n\n医療機関からの連絡をお待ちください。');
+                // 実際はapplications.htmlへリダイレクト
+            }
+        }
+        
+        // 初期化
+        displayJobDetail();
+    </script>
+</body>
+</html>

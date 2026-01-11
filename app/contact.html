@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>お問い合わせ - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .contact-hero {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-xl);
+            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+            margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .contact-hero-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--spacing-md);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .contact-hero-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .contact-hero-description {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+        }
+        
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .contact-method {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .contact-method.active {
+            border-color: var(--primary-blue);
+            background: var(--light-blue-bg);
+        }
+        
+        .contact-method:active {
+            transform: scale(0.98);
+        }
+        
+        .contact-method-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto var(--spacing-xs);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .contact-method-title {
+            font-weight: 600;
+            font-size: var(--font-size-xs);
+        }
+        
+        .contact-form {
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .char-counter {
+            text-align: right;
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .attachment-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: var(--spacing-md);
+        }
+        
+        .attachment-area:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue-bg);
+        }
+        
+        .attachment-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--spacing-sm);
+            border-radius: 50%;
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .attached-files {
+            margin-top: var(--spacing-md);
+        }
+        
+        .attached-file {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: var(--bg-gray);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .attached-file-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .attached-file-info {
+            flex: 1;
+        }
+        
+        .attached-file-name {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+        
+        .attached-file-size {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+        
+        .remove-file-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--error-light);
+            color: var(--error);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .response-time {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: var(--info-light);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .response-time-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--info);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .contact-info-cards {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+        
+        .contact-info-card {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .contact-info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .contact-info-content {
+            flex: 1;
+        }
+        
+        .contact-info-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .contact-info-value {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">お問い合わせ</h1>
+            <button class="header-action-btn" onclick="location.href='help.html'" aria-label="ヘルプ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content" style="padding-bottom: 100px;">
+            <!-- ヒーローセクション -->
+            <div class="contact-hero">
+                <div class="contact-hero-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </div>
+                <div class="contact-hero-title">お問い合わせ</div>
+                <div class="contact-hero-description">お気軽にお問い合わせください。サポートチームが丁寧に対応いたします</div>
+            </div>
+            
+            <!-- お問い合わせ方法 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">お問い合わせ方法</h2>
+                </div>
+                
+                <div class="contact-methods">
+                    <div class="contact-method active" onclick="selectMethod('email')">
+                        <div class="contact-method-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="contact-method-title">メール</div>
+                    </div>
+                    
+                    <div class="contact-method" onclick="selectMethod('phone')">
+                        <div class="contact-method-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                        </div>
+                        <div class="contact-method-title">電話</div>
+                    </div>
+                    
+                    <div class="contact-method" onclick="selectMethod('chat')">
+                        <div class="contact-method-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="contact-method-title">チャット</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 返信時間 -->
+            <div class="response-time">
+                <div class="response-time-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; margin-bottom: 4px;">通常1営業日以内に返信</div>
+                    <div style="font-size: var(--font-size-xs);">営業時間: 平日 10:00-18:00</div>
+                </div>
+            </div>
+            
+            <!-- お問い合わせフォーム -->
+            <div class="contact-form">
+                <div class="form-group">
+                    <label class="form-label">お名前 <span style="color: var(--error);">*</span></label>
+                    <input type="text" class="form-control" placeholder="山田 太郎" id="contactName" value="山田 太郎">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">メールアドレス <span style="color: var(--error);">*</span></label>
+                    <input type="email" class="form-control" placeholder="example@email.com" id="contactEmail" value="yamada@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">電話番号</label>
+                    <input type="tel" class="form-control" placeholder="090-1234-5678" id="contactPhone">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">お問い合わせカテゴリ <span style="color: var(--error);">*</span></label>
+                    <select class="form-control" id="contactCategory">
+                        <option value="">選択してください</option>
+                        <option>アカウント・ログイン</option>
+                        <option>求人について</option>
+                        <option>応募について</option>
+                        <option>スカウトについて</option>
+                        <option>メッセージについて</option>
+                        <option>支払い・請求</option>
+                        <option>技術的な問題</option>
+                        <option>その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">件名 <span style="color: var(--error);">*</span></label>
+                    <input type="text" class="form-control" placeholder="お問い合わせ内容を簡潔に" id="contactSubject">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">お問い合わせ内容 <span style="color: var(--error);">*</span></label>
+                    <textarea class="form-control" rows="6" placeholder="できるだけ詳しくお書きください" id="contactMessage" oninput="updateCharCount(this.value)" maxlength="1000"></textarea>
+                    <div class="char-counter"><span id="charCount">0</span> / 1000</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">添付ファイル（任意）</label>
+                    <div class="attachment-area" onclick="selectFiles()">
+                        <div class="attachment-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                            </svg>
+                        </div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">ファイルを添付</div>
+                        <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+                            画像・PDF対応（最大5MB）
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;" multiple accept="image/*,.pdf" onchange="handleFiles(this.files)">
+                    
+                    <div class="attached-files" id="attachedFiles" style="display: none;">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    お問い合わせ内容によっては、お時間をいただく場合がございます
+                </div>
+            </div>
+            
+            <!-- 連絡先情報 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">その他の連絡方法</h2>
+                </div>
+                
+                <div class="contact-info-cards">
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                        </div>
+                        <div class="contact-info-content">
+                            <div class="contact-info-label">電話サポート</div>
+                            <div class="contact-info-value">0120-XXX-XXX</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline" onclick="callSupport()">電話</button>
+                    </div>
+                    
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="contact-info-content">
+                            <div class="contact-info-label">メールアドレス</div>
+                            <div class="contact-info-value">support@medimatch.jp</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline" onclick="copyEmail()">コピー</button>
+                    </div>
+                    
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="contact-info-content">
+                            <div class="contact-info-label">営業時間</div>
+                            <div class="contact-info-value">平日 10:00-18:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- よくある質問へのリンク -->
+            <div class="section">
+                <a href="help.html" class="btn btn-outline" style="width: 100%;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    よくある質問を見る
+                </a>
+            </div>
+        </main>
+        
+        <!-- 送信ボタン -->
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; padding: var(--spacing-md); background: var(--bg-white); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); z-index: 100;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="submitContact()">
+                送信する
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        let attachedFiles = [];
+        
+        // お問い合わせ方法選択
+        function selectMethod(method) {
+            document.querySelectorAll('.contact-method').forEach(el => el.classList.remove('active'));
+            event.target.closest('.contact-method').classList.add('active');
+            
+            if (method === 'phone') {
+                alert('電話でのお問い合わせ\n\n0120-XXX-XXX\n営業時間: 平日 10:00-18:00');
+            } else if (method === 'chat') {
+                alert('チャットサポート\n\n平日 10:00-18:00\nリアルタイムでご相談いただけます');
+            }
+        }
+        
+        // 文字数カウント
+        function updateCharCount(text) {
+            document.getElementById('charCount').textContent = text.length;
+        }
+        
+        // ファイル選択
+        function selectFiles() {
+            document.getElementById('fileInput').click();
+        }
+        
+        // ファイル処理
+        function handleFiles(files) {
+            const container = document.getElementById('attachedFiles');
+            
+            Array.from(files).forEach(file => {
+                // ファイルサイズチェック（5MB）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`${file.name} のサイズが大きすぎます（最大5MB）`);
+                    return;
+                }
+                
+                attachedFiles.push(file);
+                
+                const fileElement = document.createElement('div');
+                fileElement.className = 'attached-file';
+                fileElement.innerHTML = `
+                    <div class="attached-file-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                            <polyline points="13 2 13 9 20 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="attached-file-info">
+                        <div class="attached-file-name">${file.name}</div>
+                        <div class="attached-file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <div class="remove-file-btn" onclick="removeFile(this, '${file.name}')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                `;
+                
+                container.appendChild(fileElement);
+            });
+            
+            if (attachedFiles.length > 0) {
+                container.style.display = 'block';
+            }
+        }
+        
+        // ファイルサイズフォーマット
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        // ファイル削除
+        function removeFile(element, fileName) {
+            attachedFiles = attachedFiles.filter(f => f.name !== fileName);
+            element.closest('.attached-file').remove();
+            
+            if (attachedFiles.length === 0) {
+                document.getElementById('attachedFiles').style.display = 'none';
+            }
+        }
+        
+        // お問い合わせ送信
+        function submitContact() {
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const category = document.getElementById('contactCategory').value;
+            const subject = document.getElementById('contactSubject').value.trim();
+            const message = document.getElementById('contactMessage').value.trim();
+            
+            // バリデーション
+            if (!name) {
+                alert('お名前を入力してください');
+                return;
+            }
+            
+            if (!email) {
+                alert('メールアドレスを入力してください');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                alert('有効なメールアドレスを入力してください');
+                return;
+            }
+            
+            if (!category) {
+                alert('お問い合わせカテゴリを選択してください');
+                return;
+            }
+            
+            if (!subject) {
+                alert('件名を入力してください');
+                return;
+            }
+            
+            if (!message) {
+                alert('お問い合わせ内容を入力してください');
+                return;
+            }
+            
+            if (message.length < 10) {
+                alert('お問い合わせ内容は10文字以上入力してください');
+                return;
+            }
+            
+            // 送信処理（デモ）
+            alert(`お問い合わせを送信しました\n\n【送信内容】\nお名前: ${name}\nメール: ${email}\nカテゴリ: ${category}\n件名: ${subject}\n\n登録いただいたメールアドレスに確認メールを送信しました。\n通常1営業日以内に返信いたします。`);
+            
+            // フォームリセット
+            document.getElementById('contactSubject').value = '';
+            document.getElementById('contactMessage').value = '';
+            document.getElementById('contactCategory').value = '';
+            document.getElementById('charCount').textContent = '0';
+            attachedFiles = [];
+            document.getElementById('attachedFiles').innerHTML = '';
+            document.getElementById('attachedFiles').style.display = 'none';
+        }
+        
+        // 電話サポート
+        function callSupport() {
+            window.location.href = 'tel:0120-XXX-XXX';
+        }
+        
+        // メールコピー
+        function copyEmail() {
+            navigator.clipboard.writeText('support@medimatch.jp').then(() => {
+                alert('メールアドレスをコピーしました');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>求人検索 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <h1 class="header-title">求人検索</h1>
+            <button class="header-action-btn" onclick="toggleFilterModal()" aria-label="フィルター">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content">
+            <!-- 検索ボックス -->
+            <div class="mobile-search-box">
+                <svg class="mobile-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input 
+                    type="search" 
+                    class="form-control" 
+                    placeholder="キーワードで検索"
+                    id="searchInput"
+                    oninput="filterJobs()"
+                >
+                <button class="mobile-search-clear" onclick="clearSearch()" style="display: none;" id="clearBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- フィルターチップ -->
+            <div class="filter-chips hide-scrollbar">
+                <button class="filter-chip active" data-filter="all" onclick="selectFilter(this)">すべて</button>
+                <button class="filter-chip" data-filter="常勤" onclick="selectFilter(this)">常勤</button>
+                <button class="filter-chip" data-filter="非常勤" onclick="selectFilter(this)">非常勤</button>
+                <button class="filter-chip" data-filter="スポット" onclick="selectFilter(this)">スポット</button>
+                <button class="filter-chip" data-specialty="内科" onclick="selectSpecialtyFilter(this)">内科</button>
+                <button class="filter-chip" data-specialty="外科" onclick="selectSpecialtyFilter(this)">外科</button>
+                <button class="filter-chip" data-specialty="整形外科" onclick="selectSpecialtyFilter(this)">整形外科</button>
+            </div>
+            
+            <!-- 検索結果数 -->
+            <div class="mb-md">
+                <span class="fw-semibold" id="resultCount">20</span> 件の求人が見つかりました
+            </div>
+            
+            <!-- 求人リスト -->
+            <div id="jobList">
+                <!-- JavaScriptで動的に生成 -->
+            </div>
+        </main>
+        
+        <!-- ボトムナビゲーション -->
+        <nav class="bottom-nav">
+            <a href="home.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>ホーム</span>
+            </a>
+            
+            <a href="job-search.html" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span>求人検索</span>
+            </a>
+            
+            <a href="scouts.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>スカウト</span>
+                <span class="nav-badge">8</span>
+            </a>
+            
+            <a href="messages.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>メッセージ</span>
+                <span class="nav-badge">2</span>
+            </a>
+            
+            <a href="profile.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>マイページ</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- フィルターモーダル（簡易版） -->
+    <div id="filterModal" class="action-sheet-overlay" style="display: none;" onclick="toggleFilterModal()">
+        <div class="action-sheet" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom: var(--spacing-lg);">詳細フィルター</h3>
+            
+            <div class="form-group">
+                <label class="form-label">診療科</label>
+                <select class="form-control" id="specialtyFilter">
+                    <option value="">すべて</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">雇用形態</label>
+                <select class="form-control" id="employmentTypeFilter">
+                    <option value="">すべて</option>
+                    <option value="常勤">常勤</option>
+                    <option value="非常勤">非常勤</option>
+                    <option value="スポット">スポット</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">地域</label>
+                <select class="form-control" id="prefectureFilter">
+                    <option value="">すべて</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                <button class="btn btn-outline" style="flex: 1;" onclick="resetFilters()">リセット</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="applyFilters()">適用</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        let currentFilters = {
+            employmentType: 'all',
+            specialty: '',
+            prefecture: '',
+            query: ''
+        };
+        
+        // フィルター選択肢の初期化
+        function initFilters() {
+            const specialtyFilter = document.getElementById('specialtyFilter');
+            SPECIALTIES.forEach(specialty => {
+                const option = document.createElement('option');
+                option.value = specialty;
+                option.textContent = specialty;
+                specialtyFilter.appendChild(option);
+            });
+            
+            const prefectureFilter = document.getElementById('prefectureFilter');
+            PREFECTURES.forEach(pref => {
+                const option = document.createElement('option');
+                option.value = pref;
+                option.textContent = pref;
+                prefectureFilter.appendChild(option);
+            });
+        }
+        
+        // 求人リストを表示
+        function displayJobs(jobs = DEMO_JOBS) {
+            const container = document.getElementById('jobList');
+            container.innerHTML = '';
+            
+            document.getElementById('resultCount').textContent = jobs.length;
+            
+            jobs.forEach(job => {
+                const matchScore = Math.floor(Math.random() * 20) + 80; // 80-100のランダムスコア
+                
+                const item = document.createElement('a');
+                item.href = 'job-detail.html?id=' + job.id;
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="list-item-icon" style="background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); color: white; font-size: var(--font-size-lg); font-weight: 600;">
+                        ${matchScore}%
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">${job.title}</div>
+                        <div class="list-item-subtitle">${job.facilityName} · ${job.location}</div>
+                        <div class="list-item-meta">
+                            <span class="badge badge-primary">${job.specialty}</span>
+                            <span class="badge badge-gray">${job.employmentType}</span>
+                            ${job.onCallRequired ? '<span class="badge badge-warning">当直あり</span>' : ''}
+                        </div>
+                        <div class="list-item-meta mt-xs">
+                            <span class="text-primary fw-semibold">${formatSalary(job.salaryType, job.salaryMin, job.salaryMax)}</span>
+                        </div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                `;
+                container.appendChild(item);
+            });
+            
+            if (jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="mobile-empty-state">
+                        <svg class="mobile-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <div class="mobile-empty-title">求人が見つかりませんでした</div>
+                        <div class="mobile-empty-description">条件を変更して再度検索してください</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // フィルターチップ選択
+        function selectFilter(element) {
+            document.querySelectorAll('.filter-chip[data-filter]').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            currentFilters.employmentType = element.dataset.filter;
+            filterJobs();
+        }
+        
+        // 診療科フィルターチップ選択
+        function selectSpecialtyFilter(element) {
+            if (element.classList.contains('active')) {
+                element.classList.remove('active');
+                currentFilters.specialty = '';
+            } else {
+                document.querySelectorAll('.filter-chip[data-specialty]').forEach(chip => {
+                    chip.classList.remove('active');
+                });
+                element.classList.add('active');
+                currentFilters.specialty = element.dataset.specialty;
+            }
+            filterJobs();
+        }
+        
+        // 検索・フィルター実行
+        function filterJobs() {
+            const query = document.getElementById('searchInput').value;
+            currentFilters.query = query;
+            
+            // クリアボタンの表示/非表示
+            document.getElementById('clearBtn').style.display = query ? 'block' : 'none';
+            
+            let results = [...DEMO_JOBS];
+            
+            // 雇用形態フィルター
+            if (currentFilters.employmentType !== 'all') {
+                results = results.filter(job => job.employmentType === currentFilters.employmentType);
+            }
+            
+            // 診療科フィルター
+            if (currentFilters.specialty) {
+                results = results.filter(job => job.specialty === currentFilters.specialty);
+            }
+            
+            // 地域フィルター
+            if (currentFilters.prefecture) {
+                results = results.filter(job => job.prefecture === currentFilters.prefecture);
+            }
+            
+            // キーワード検索
+            if (query) {
+                const q = query.toLowerCase();
+                results = results.filter(job => 
+                    job.title.toLowerCase().includes(q) ||
+                    job.facilityName.toLowerCase().includes(q) ||
+                    job.description.toLowerCase().includes(q)
+                );
+            }
+            
+            displayJobs(results);
+        }
+        
+        // 検索クリア
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentFilters.query = '';
+            filterJobs();
+        }
+        
+        // フィルターモーダル開閉
+        function toggleFilterModal() {
+            const modal = document.getElementById('filterModal');
+            modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        // フィルター適用
+        function applyFilters() {
+            currentFilters.specialty = document.getElementById('specialtyFilter').value;
+            currentFilters.employmentType = document.getElementById('employmentTypeFilter').value || 'all';
+            currentFilters.prefecture = document.getElementById('prefectureFilter').value;
+            
+            filterJobs();
+            toggleFilterModal();
+        }
+        
+        // フィルターリセット
+        function resetFilters() {
+            document.getElementById('specialtyFilter').value = '';
+            document.getElementById('employmentTypeFilter').value = '';
+            document.getElementById('prefectureFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            
+            currentFilters = {
+                employmentType: 'all',
+                specialty: '',
+                prefecture: '',
+                query: ''
+            };
+            
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            document.querySelector('.filter-chip[data-filter="all"]').classList.add('active');
+            
+            filterJobs();
+            toggleFilterModal();
+        }
+        
+        // 初期化
+        initFilters();
+        displayJobs();
+    </script>
+</body>
+</html>

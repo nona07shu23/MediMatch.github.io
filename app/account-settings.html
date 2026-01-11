@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>アカウント設定 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+    <style>
+        .account-info-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-xl);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .account-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 auto var(--spacing-md);
+        }
+        
+        .account-name {
+            text-align: center;
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .account-email {
+            text-align: center;
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .account-status {
+            display: flex;
+            gap: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .account-status-item {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .account-status-label {
+            font-size: var(--font-size-xs);
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        
+        .account-status-value {
+            font-weight: 600;
+        }
+        
+        .security-level {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: var(--bg-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .security-level-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .security-level-content {
+            flex: 1;
+        }
+        
+        .security-level-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .security-level-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .security-level-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+        
+        .security-level-badge.high {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .security-level-badge.medium {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .security-level-badge.low {
+            background: var(--error-light);
+            color: var(--error);
+        }
+        
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .session-item {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-gray);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .session-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-device {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .session-details {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+        
+        .session-current {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .password-strength {
+            margin-top: var(--spacing-sm);
+        }
+        
+        .password-strength-bar {
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        
+        .password-strength-fill {
+            height: 100%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        
+        .password-strength-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+        
+        .password-requirements {
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: var(--bg-gray);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-xs);
+        }
+        
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            margin-bottom: 4px;
+        }
+        
+        .requirement-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .requirement-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-300);
+            color: white;
+        }
+        
+        .requirement-check.met {
+            background: var(--success);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <h1 class="header-title">アカウント設定</h1>
+            <button class="header-action-btn" onclick="showHelp()" aria-label="ヘルプ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content">
+            <!-- アカウント情報 -->
+            <div class="account-info-card">
+                <div class="account-avatar" id="accountAvatar">山</div>
+                <div class="account-name" id="accountName">山田太郎</div>
+                <div class="account-email" id="accountEmail">yamada@example.com</div>
+                <div class="account-status">
+                    <div class="account-status-item">
+                        <div class="account-status-label">登録日</div>
+                        <div class="account-status-value">2025年3月</div>
+                    </div>
+                    <div class="account-status-item">
+                        <div class="account-status-label">会員種別</div>
+                        <div class="account-status-value">無料会員</div>
+                    </div>
+                    <div class="account-status-item">
+                        <div class="account-status-label">ログイン</div>
+                        <div class="account-status-value">234回</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- セキュリティレベル -->
+            <div class="security-level">
+                <div class="security-level-icon" style="background: var(--warning-light); color: var(--warning);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <div class="security-level-content">
+                    <div class="security-level-title">セキュリティレベル</div>
+                    <div class="security-level-description">二段階認証を有効にして強化</div>
+                </div>
+                <div class="security-level-badge medium">中</div>
+            </div>
+            
+            <!-- ログイン情報 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">ログイン情報</h2>
+                </div>
+                
+                <a href="#" class="list-item" onclick="changeEmail(); return false;">
+                    <div class="list-item-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">メールアドレス</div>
+                        <div class="list-item-subtitle">yamada@example.com
+                            <span class="verification-badge ml-xs">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                認証済
+                            </span>
+                        </div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+                
+                <a href="#" class="list-item" onclick="changePassword(); return false;">
+                    <div class="list-item-icon" style="background: var(--warning-light); color: var(--warning);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">パスワード</div>
+                        <div class="list-item-subtitle">最終変更: 2025年12月1日</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+                
+                <a href="#" class="list-item" onclick="changePhone(); return false;">
+                    <div class="list-item-icon" style="background: var(--success-light); color: var(--success);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">電話番号</div>
+                        <div class="list-item-subtitle">090-1234-5678
+                            <span class="verification-badge ml-xs">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                認証済
+                            </span>
+                        </div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+            
+            <!-- セキュリティ -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">セキュリティ</h2>
+                </div>
+                
+                <div class="mobile-card mb-md">
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">二段階認証</div>
+                            <div class="setting-item-subtitle">ログイン時に追加の認証が必要</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" onchange="toggle2FA(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">生体認証</div>
+                            <div class="setting-item-subtitle">指紋・顔認証でログイン</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <a href="#" class="list-item" onclick="viewLoginHistory(); return false;">
+                    <div class="list-item-icon" style="background: var(--info-light); color: var(--info);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">ログイン履歴</div>
+                        <div class="list-item-subtitle">最終: 今日 15:30 (iPhone)</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+                
+                <a href="#" class="list-item" onclick="viewActiveSessions(); return false;">
+                    <div class="list-item-icon" style="background: var(--warning-light); color: var(--warning);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">アクティブなセッション</div>
+                        <div class="list-item-subtitle">2つのデバイスでログイン中</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+            
+            <!-- 連携サービス -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">連携サービス</h2>
+                </div>
+                
+                <div class="mobile-card">
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">Googleカレンダー</div>
+                            <div class="setting-item-subtitle">面接予定を自動同期</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-item-content">
+                            <div class="setting-item-title">LINE通知</div>
+                            <div class="setting-item-subtitle">重要な通知をLINEで受信</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- アカウント管理 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">アカウント管理</h2>
+                </div>
+                
+                <a href="#" class="list-item" onclick="exportData(); return false;">
+                    <div class="list-item-icon" style="background: var(--light-blue-bg); color: var(--primary-blue);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">データのエクスポート</div>
+                        <div class="list-item-subtitle">アカウントデータをダウンロード</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+                
+                <a href="#" class="list-item" onclick="deactivateAccount(); return false;">
+                    <div class="list-item-icon" style="background: var(--warning-light); color: var(--warning);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">アカウントを一時停止</div>
+                        <div class="list-item-subtitle">いつでも再開できます</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+                
+                <a href="#" class="list-item" onclick="deleteAccount(); return false;">
+                    <div class="list-item-icon" style="background: var(--error-light); color: var(--error);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </div>
+                    <div class="list-item-content">
+                        <div class="list-item-title">アカウントを削除</div>
+                        <div class="list-item-subtitle" style="color: var(--error);">この操作は元に戻せません</div>
+                    </div>
+                    <svg class="list-item-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </main>
+    </div>
+    
+    <!-- メールアドレス変更モーダル -->
+    <div id="emailModal" class="action-sheet-overlay" style="display: none;" onclick="hideEmailModal()">
+        <div class="action-sheet" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-bottom: var(--spacing-lg);">メールアドレス変更</h3>
+            
+            <div class="form-group">
+                <label class="form-label">現在のメールアドレス</label>
+                <input type="email" class="form-control" value="yamada@example.com" disabled>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">新しいメールアドレス</label>
+                <input type="email" class="form-control" placeholder="新しいメールアドレス" id="newEmail">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">パスワード（確認のため）</label>
+                <input type="password" class="form-control" placeholder="パスワード">
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                新しいメールアドレスに確認メールを送信します
+            </div>
+            
+            <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                <button class="btn btn-outline" style="flex: 1;" onclick="hideEmailModal()">キャンセル</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="submitEmailChange()">変更する</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- パスワード変更モーダル -->
+    <div id="passwordModal" class="action-sheet-overlay" style="display: none;" onclick="hidePasswordModal()">
+        <div class="action-sheet" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-bottom: var(--spacing-lg);">パスワード変更</h3>
+            
+            <div class="form-group">
+                <label class="form-label">現在のパスワード</label>
+                <input type="password" class="form-control" placeholder="現在のパスワード">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">新しいパスワード</label>
+                <input type="password" class="form-control" placeholder="新しいパスワード" id="newPassword" oninput="checkPasswordStrength(this.value)">
+                <div class="password-strength">
+                    <div class="password-strength-bar">
+                        <div class="password-strength-fill" id="strengthBar" style="width: 0%; background: var(--gray-400);"></div>
+                    </div>
+                    <div class="password-strength-label" id="strengthLabel">パスワードを入力してください</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">新しいパスワード（確認）</label>
+                <input type="password" class="form-control" placeholder="パスワードを再入力">
+            </div>
+            
+            <div class="password-requirements">
+                <div style="font-weight: 600; margin-bottom: var(--spacing-xs);">パスワードの要件:</div>
+                <div class="requirement-item">
+                    <div class="requirement-check" id="req-length">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <span>8文字以上</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-check" id="req-upper">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <span>大文字を含む</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-check" id="req-number">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <span>数字を含む</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-check" id="req-special">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <span>記号を含む (!@#$%など)</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                <button class="btn btn-outline" style="flex: 1;" onclick="hidePasswordModal()">キャンセル</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="submitPasswordChange()">変更する</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        // ユーザー情報表示
+        const userName = sessionStorage.getItem('userName') || 'ゲスト';
+        document.getElementById('accountName').textContent = userName;
+        document.getElementById('accountAvatar').textContent = userName.substring(0, 1);
+        
+        // メールアドレス変更
+        function changeEmail() {
+            document.getElementById('emailModal').style.display = 'flex';
+        }
+        
+        function hideEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+        
+        function submitEmailChange() {
+            const newEmail = document.getElementById('newEmail').value;
+            if (newEmail && newEmail.includes('@')) {
+                alert(`確認メールを ${newEmail} に送信しました。\n\nメール内のリンクをクリックして変更を完了してください。`);
+                hideEmailModal();
+            } else {
+                alert('有効なメールアドレスを入力してください');
+            }
+        }
+        
+        // パスワード変更
+        function changePassword() {
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+        
+        function hidePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+        
+        function checkPasswordStrength(password) {
+            const lengthOk = password.length >= 8;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            
+            // 要件チェック
+            document.getElementById('req-length').classList.toggle('met', lengthOk);
+            document.getElementById('req-upper').classList.toggle('met', hasUpper);
+            document.getElementById('req-number').classList.toggle('met', hasNumber);
+            document.getElementById('req-special').classList.toggle('met', hasSpecial);
+            
+            // 強度計算
+            let strength = 0;
+            if (lengthOk) strength++;
+            if (hasUpper) strength++;
+            if (hasNumber) strength++;
+            if (hasSpecial) strength++;
+            
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthLabel = document.getElementById('strengthLabel');
+            
+            if (strength === 0) {
+                strengthBar.style.width = '0%';
+                strengthBar.style.background = 'var(--gray-400)';
+                strengthLabel.textContent = 'パスワードを入力してください';
+            } else if (strength === 1) {
+                strengthBar.style.width = '25%';
+                strengthBar.style.background = 'var(--error)';
+                strengthLabel.textContent = '弱い';
+            } else if (strength === 2) {
+                strengthBar.style.width = '50%';
+                strengthBar.style.background = 'var(--warning)';
+                strengthLabel.textContent = '普通';
+            } else if (strength === 3) {
+                strengthBar.style.width = '75%';
+                strengthBar.style.background = 'var(--info)';
+                strengthLabel.textContent = '良い';
+            } else if (strength === 4) {
+                strengthBar.style.width = '100%';
+                strengthBar.style.background = 'var(--success)';
+                strengthLabel.textContent = '強い';
+            }
+        }
+        
+        function submitPasswordChange() {
+            alert('パスワードを変更しました');
+            hidePasswordModal();
+        }
+        
+        // 電話番号変更
+        function changePhone() {
+            alert('電話番号変更画面');
+        }
+        
+        // 二段階認証
+        function toggle2FA(enabled) {
+            if (enabled) {
+                alert('二段階認証の設定\n\n1. 認証アプリをインストール\n2. QRコードをスキャン\n3. 確認コードを入力');
+            } else {
+                if (confirm('二段階認証を無効にしますか？\n\nセキュリティレベルが低下します。')) {
+                    alert('二段階認証を無効にしました');
+                } else {
+                    event.target.checked = true;
+                }
+            }
+        }
+        
+        // ログイン履歴
+        function viewLoginHistory() {
+            alert('ログイン履歴\n\n2026/01/11 15:30 - iPhone (東京)\n2026/01/11 09:15 - PC (東京)\n2026/01/10 18:20 - iPhone (東京)');
+        }
+        
+        // アクティブセッション
+        function viewActiveSessions() {
+            alert('アクティブなセッション\n\n1. iPhone 13 (このデバイス)\n   最終アクセス: たった今\n   場所: 東京\n\n2. Windows PC\n   最終アクセス: 6時間前\n   場所: 東京');
+        }
+        
+        // データエクスポート
+        function exportData() {
+            if (confirm('アカウントデータをエクスポートしますか？\n\nプロフィール、応募履歴、メッセージなどが含まれます。')) {
+                alert('データのエクスポートをリクエストしました。\n準備ができ次第、メールでお知らせします。');
+            }
+        }
+        
+        // アカウント一時停止
+        function deactivateAccount() {
+            if (confirm('アカウントを一時停止しますか？\n\n• プロフィールが非公開になります\n• スカウトを受け取れません\n• いつでも再開できます')) {
+                alert('アカウントを一時停止しました');
+            }
+        }
+        
+        // アカウント削除
+        function deleteAccount() {
+            const confirmation = prompt('アカウントを完全に削除しますか？\n\nこの操作は元に戻せません。\n削除するには「削除」と入力してください:');
+            if (confirmation === '削除') {
+                alert('アカウント削除のリクエストを受け付けました。\n30日間の猶予期間後に完全に削除されます。');
+            } else if (confirmation !== null) {
+                alert('入力が正しくありません');
+            }
+        }
+        
+        // ヘルプ
+        function showHelp() {
+            alert('アカウント設定ヘルプ\n\n• メールアドレス・パスワードの変更\n• 二段階認証でセキュリティ強化\n• ログイン履歴の確認\n• アカウントの一時停止・削除');
+        }
+    </script>
+</body>
+</html>

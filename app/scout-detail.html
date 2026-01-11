@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>スカウト詳細 - MediMatch</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="app-style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <button class="header-back-btn" onclick="history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                戻る
+            </button>
+            <button class="header-action-btn" aria-label="メニュー">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="app-content" id="main-content" style="padding-bottom: 100px;">
+            <!-- ヘッダー情報 -->
+            <div class="profile-header" style="margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-md); border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-md);">
+                    <div>
+                        <div class="badge" style="background: rgba(255, 255, 255, 0.2); color: white; margin-bottom: var(--spacing-sm);">総合病院</div>
+                        <div style="font-size: var(--font-size-xl); font-weight: 600; margin-bottom: var(--spacing-xs);">東京メディカルセンター</div>
+                        <div style="font-size: var(--font-size-base); opacity: 0.9;">消化器内科医師</div>
+                    </div>
+                    <div style="background: white; color: var(--primary-blue); padding: 8px 12px; border-radius: var(--border-radius-md); font-weight: 600;">
+                        マッチ度<br><span style="font-size: var(--font-size-2xl);">95%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 提示給与カード -->
+            <div class="mobile-card" style="background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); color: white; text-align: center;">
+                <div style="font-size: var(--font-size-sm); opacity: 0.9; margin-bottom: var(--spacing-xs);">提示給与</div>
+                <div style="font-size: var(--font-size-3xl); font-weight: 700; margin-bottom: var(--spacing-xs);">時給 15,000円</div>
+                <div style="font-size: var(--font-size-sm); opacity: 0.9;">※交通費別途支給</div>
+            </div>
+            
+            <!-- 基本情報 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">募集条件</h2>
+                </div>
+                
+                <div style="display: grid; gap: var(--spacing-md);">
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">勤務形態</div>
+                            <div class="fw-medium">非常勤</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">勤務日数</div>
+                            <div class="fw-medium">週1-2日（曜日応相談）</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">勤務時間</div>
+                            <div class="fw-medium">9:00～17:00（休憩1時間）</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">勤務地</div>
+                            <div class="fw-medium">東京都渋谷区神宮前1-2-3</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">当直</div>
+                            <div class="fw-medium">なし</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">勤務開始時期</div>
+                            <div class="fw-medium">相談可（来月～可能）</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- スカウトメッセージ -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">スカウトメッセージ</h2>
+                </div>
+                <div style="background: var(--bg-light); padding: var(--spacing-md); border-radius: var(--border-radius-md); line-height: 1.7;">
+                    この度は、あなたのプロフィールを拝見し、ぜひ当院で勤務していただきたくスカウトさせていただきました。<br><br>
+                    
+                    当院は渋谷駅から徒歩5分の総合病院で、消化器内科の充実を図っております。特に内視鏡検査の経験が豊富な先生を探しており、あなたのご経歴が当院のニーズと合致すると感じました。<br><br>
+                    
+                    勤務日数は週1回からでも歓迎です。設備も最新のものを揃えており、働きやすい環境を整えております。<br><br>
+                    
+                    ご興味がございましたら、ぜひ一度お話しさせていただければ幸いです。
+                </div>
+                <div class="text-muted text-end mt-sm" style="font-size: var(--font-size-sm);">2日前に受信</div>
+            </div>
+            
+            <!-- 求められるスキル -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">求められるスキル</h2>
+                </div>
+                <div class="d-flex" style="flex-wrap: wrap; gap: var(--spacing-sm);">
+                    <span class="badge badge-primary">消化器内科</span>
+                    <span class="badge badge-primary">上部消化管内視鏡</span>
+                    <span class="badge badge-primary">下部消化管内視鏡</span>
+                    <span class="badge badge-primary">腹部エコー</span>
+                    <span class="badge badge-primary">経験5年以上</span>
+                </div>
+            </div>
+            
+            <!-- 施設情報 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">施設情報</h2>
+                </div>
+                
+                <div class="d-flex mb-md" style="gap: var(--spacing-md);">
+                    <div style="width: 80px; height: 80px; border-radius: var(--border-radius-md); background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; flex-shrink: 0;">
+                        🏥
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="fw-semibold mb-xs">東京メディカルセンター</div>
+                        <div class="text-muted" style="font-size: var(--font-size-sm);">総合病院 · 病床数: 350床</div>
+                        <div class="text-muted" style="font-size: var(--font-size-sm);">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            東京都渋谷区
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; gap: var(--spacing-md);">
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">アクセス</div>
+                            <div class="fw-medium">渋谷駅から徒歩5分</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">診療科目</div>
+                            <div class="fw-medium">内科、外科、整形外科、小児科など18科</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- その他の条件 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">その他の条件</h2>
+                </div>
+                
+                <div style="display: grid; gap: var(--spacing-md);">
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">手当</div>
+                            <div class="fw-medium">交通費全額支給、白衣貸与</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex" style="gap: var(--spacing-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; color: var(--primary-blue);">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <div style="flex: 1;">
+                            <div class="text-muted" style="font-size: var(--font-size-sm);">こだわり条件</div>
+                            <div class="fw-medium">駅近、当直なし、ゆったり診療</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- アクションボタン -->
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; padding: var(--spacing-md); background: var(--bg-white); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); display: flex; gap: var(--spacing-sm); z-index: 100;">
+            <button class="btn btn-outline" style="flex: 1;" onclick="declineScout()">
+                辞退する
+            </button>
+            <button class="btn btn-primary" style="flex: 2;" onclick="acceptScout()">
+                興味があります
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        function acceptScout() {
+            if (confirm('このスカウトに興味を示しますか？\nチャットでやり取りを開始できます。')) {
+                alert('スカウトを承諾しました！\nメッセージ画面に移動します。');
+                // location.href = 'messages.html';
+                history.back();
+            }
+        }
+        
+        function declineScout() {
+            if (confirm('このスカウトを辞退しますか？')) {
+                alert('スカウトを辞退しました。');
+                history.back();
+            }
+        }
+    </script>
+</body>
+</html>

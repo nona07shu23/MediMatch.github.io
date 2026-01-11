@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医師詳細 - MediMatch 医療機関向け</title>
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="web-style.css">
+    <style>
+        .profile-header-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: var(--spacing-2xl);
+            border-radius: var(--border-radius-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .profile-header-content {
+            display: flex;
+            gap: var(--spacing-xl);
+            align-items: flex-start;
+        }
+        
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: var(--border-radius-xl);
+            background-color: white;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            flex-shrink: 0;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .profile-header-info {
+            flex: 1;
+        }
+        
+        .profile-name-large {
+            font-size: var(--font-size-4xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .profile-specialty-large {
+            font-size: var(--font-size-xl);
+            opacity: 0.95;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .profile-meta-row {
+            display: flex;
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-base);
+        }
+        
+        .match-score-large {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .match-score-value {
+            font-size: var(--font-size-4xl);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .match-score-label {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+        }
+        
+        .info-section {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .info-section-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--primary-blue);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+        }
+        
+        .info-item {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .info-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+        }
+        
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+        
+        .experience-item {
+            padding: var(--spacing-md);
+            background-color: var(--gray-50);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .experience-period {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .experience-position {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .experience-facility {
+            color: var(--text-secondary);
+        }
+        
+        .availability-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+        }
+        
+        .availability-status.available {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+        
+        .availability-status.unavailable {
+            background-color: var(--gray-100);
+            color: var(--gray-600);
+        }
+        
+        .action-buttons {
+            position: sticky;
+            bottom: 0;
+            background-color: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            display: flex;
+            gap: var(--spacing-md);
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+            margin: 0 calc(var(--spacing-xl) * -1) calc(var(--spacing-xl) * -1);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-header-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+    
+    <div class="web-container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">M</div>
+                    <span class="logo-text">MediMatch</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>ダッシュボード</span>
+                </a>
+                
+                <a href="job-list.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <span>求人管理</span>
+                </a>
+                
+                <a href="doctor-search.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span>医師検索</span>
+                </a>
+                
+                <a href="applications.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>応募管理</span>
+                </a>
+                
+                <a href="scouts.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>スカウト管理</span>
+                </a>
+                
+                <a href="messages.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>メッセージ</span>
+                    <span class="badge badge-error" style="margin-left: auto;">3</span>
+                </a>
+                
+                <a href="settings.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>設定</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="btn btn-outline btn-sm" id="menuToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">医師詳細</h1>
+                </div>
+                
+                <div class="header-right">
+                    <button class="btn btn-outline btn-sm" onclick="history.back()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        戻る
+                    </button>
+                    
+                    <div class="notification-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    
+                    <div class="user-menu">
+                        <div class="user-menu-button">
+                            <div class="user-avatar">東</div>
+                            <span id="userName">東京総合病院</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-menu-header">
+                                <div class="dropdown-menu-user-name">東京総合病院</div>
+                                <div class="dropdown-menu-user-email">facility@demo.medimatch.jp</div>
+                            </div>
+                            <div class="dropdown-menu-body">
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>アカウント設定</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-menu-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 6v6m5.196-11.196l-4.243 4.243M7.757 16.243l-4.243 4.243m11.314-4.243l4.243 4.243M7.757 7.757l-4.243-4.243"></path>
+                                    </svg>
+                                    <span>設定</span>
+                                </a>
+                                <div class="dropdown-menu-divider"></div>
+                                <a href="#" class="dropdown-menu-item danger" onclick="event.preventDefault(); signOut();">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>サインアウト</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content-area" id="main-content">
+                <div class="breadcrumb mb-lg">
+                    <a href="dashboard.html">ホーム</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <a href="doctor-search.html">医師検索</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span>医師詳細</span>
+                </div>
+                
+                <!-- プロフィールヘッダー -->
+                <div class="profile-header-card">
+                    <div class="profile-header-content">
+                        <div class="profile-avatar-large" id="doctorAvatar">佐</div>
+                        <div class="profile-header-info">
+                            <div class="profile-name-large" id="doctorName">佐藤健一</div>
+                            <div class="profile-specialty-large" id="doctorSpecialty">内科 / 消化器内科</div>
+                            <div class="profile-meta-row">
+                                <div class="profile-meta-item">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <span id="doctorExperience">15年経験</span>
+                                </div>
+                                <div class="profile-meta-item">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span id="doctorAge">38歳</span>
+                                </div>
+                                <div class="profile-meta-item">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                    <span id="doctorCases">症例数 1,200件</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="match-score-large">
+                            <div class="match-score-value" id="matchScore">92%</div>
+                            <div class="match-score-label">マッチ度</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 基本情報 -->
+                <div class="info-section">
+                    <h2 class="info-section-title">基本情報</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">氏名</div>
+                            <div class="info-value" id="nameDetail">佐藤 健一</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">年齢</div>
+                            <div class="info-value" id="ageDetail">38歳</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">専門科</div>
+                            <div class="info-value" id="specialtyDetail">内科（消化器内科）</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">経験年数</div>
+                            <div class="info-value" id="experienceDetail">15年</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">勤務可能状況</div>
+                            <div class="info-value">
+                                <span class="availability-status available" id="availabilityStatus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    勤務可能
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">総症例数</div>
+                            <div class="info-value" id="casesDetail">1,200件</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 資格・専門医 -->
+                <div class="info-section">
+                    <h2 class="info-section-title">資格・専門医</h2>
+                    <div class="skills-grid" id="certificationsList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+                
+                <!-- スキル・得意な手技 -->
+                <div class="info-section">
+                    <h2 class="info-section-title">スキル・得意な手技</h2>
+                    <div class="skills-grid" id="skillsList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+                
+                <!-- 経歴 -->
+                <div class="info-section">
+                    <h2 class="info-section-title">経歴</h2>
+                    <div id="workHistoryList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+                
+                <!-- 希望条件 -->
+                <div class="info-section">
+                    <h2 class="info-section-title">希望条件</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">希望勤務形態</div>
+                            <div class="info-value">
+                                <div class="skills-grid" id="employmentTypesList">
+                                    <!-- JavaScriptで動的に生成 -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">希望地域</div>
+                            <div class="info-value" id="preferredLocations">東京都、神奈川県</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">希望時給</div>
+                            <div class="info-value" id="minHourlyRate">12,000円〜</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">当直</div>
+                            <div class="info-value">可能</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 自己PR -->
+                <div class="info-section">
+                    <h2 class="info-section-title">自己PR</h2>
+                    <p id="bio" style="line-height: 1.8;">
+                        消化器内科を専門とし、内視鏡検査・治療を得意としています。上部・下部消化管内視鏡検査において1,200件以上の経験があり、早期がんの発見・治療に貢献してきました。患者様一人ひとりに寄り添った丁寧な診療を心がけています。
+                    </p>
+                </div>
+                
+                <!-- アクションボタン -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-lg" style="flex: 1;" onclick="location.href='scout-create.html'">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        スカウトを送る
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="addToBookmark()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        保存
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="printProfile()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        印刷
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../common/demo-data.js"></script>
+    <script>
+        // ログイン確認
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+        
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
+        }
+        
+        // メニュートグル
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // URLパラメータから医師IDを取得（デモでは最初の医師を表示）
+        const doctor = DEMO_DOCTORS[0];
+        const matchScore = Math.floor(Math.random() * 20) + 80;
+        
+        // 医師情報を表示
+        function displayDoctorDetail() {
+            // ヘッダー情報
+            document.getElementById('doctorAvatar').textContent = doctor.name.substring(0, 1);
+            document.getElementById('doctorName').textContent = doctor.name;
+            document.getElementById('doctorSpecialty').textContent = `${doctor.specialty} / ${doctor.subSpecialty}`;
+            document.getElementById('doctorExperience').textContent = `${doctor.experience}年経験`;
+            document.getElementById('doctorAge').textContent = `${doctor.age}歳`;
+            document.getElementById('doctorCases').textContent = `症例数 ${doctor.caseCount.toLocaleString()}件`;
+            document.getElementById('matchScore').textContent = `${matchScore}%`;
+            
+            // 基本情報
+            document.getElementById('nameDetail').textContent = doctor.name;
+            document.getElementById('ageDetail').textContent = `${doctor.age}歳`;
+            document.getElementById('specialtyDetail').textContent = `${doctor.specialty}（${doctor.subSpecialty}）`;
+            document.getElementById('experienceDetail').textContent = `${doctor.experience}年`;
+            document.getElementById('casesDetail').textContent = `${doctor.caseCount.toLocaleString()}件`;
+            
+            // 勤務可能状況
+            const availabilityStatus = document.getElementById('availabilityStatus');
+            if (doctor.availability) {
+                availabilityStatus.className = 'availability-status available';
+                availabilityStatus.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    勤務可能
+                `;
+            } else {
+                availabilityStatus.className = 'availability-status unavailable';
+                availabilityStatus.textContent = '現在勤務中';
+            }
+            
+            // 資格
+            const certificationsContainer = document.getElementById('certificationsList');
+            doctor.certifications.forEach(cert => {
+                const badge = document.createElement('span');
+                badge.className = 'badge badge-primary';
+                badge.textContent = cert;
+                certificationsContainer.appendChild(badge);
+            });
+            
+            // スキル
+            const skillsContainer = document.getElementById('skillsList');
+            doctor.skills.forEach(skill => {
+                const badge = document.createElement('span');
+                badge.className = 'badge badge-gray';
+                badge.textContent = skill;
+                skillsContainer.appendChild(badge);
+            });
+            
+            // 経歴（デモデータを生成）
+            const workHistoryContainer = document.getElementById('workHistoryList');
+            const workHistory = [
+                { period: '2021年 - 現在', position: '消化器内科 医長', facility: '◯◯総合病院' },
+                { period: '2016年 - 2021年', position: '内科 医師', facility: '△△医療センター' },
+                { period: '2013年 - 2016年', position: '後期研修医', facility: '××大学病院' }
+            ];
+            
+            workHistory.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'experience-item';
+                div.innerHTML = `
+                    <div class="experience-period">${item.period}</div>
+                    <div class="experience-position">${item.position}</div>
+                    <div class="experience-facility">${item.facility}</div>
+                `;
+                workHistoryContainer.appendChild(div);
+            });
+            
+            // 希望条件
+            const employmentTypesContainer = document.getElementById('employmentTypesList');
+            doctor.employmentTypes.forEach(type => {
+                const badge = document.createElement('span');
+                badge.className = 'badge badge-info';
+                badge.textContent = type;
+                employmentTypesContainer.appendChild(badge);
+            });
+            
+            document.getElementById('preferredLocations').textContent = doctor.preferredLocations.join('、');
+            document.getElementById('minHourlyRate').textContent = `${doctor.minHourlyRate.toLocaleString()}円〜`;
+            
+            // 自己PR
+            document.getElementById('bio').textContent = doctor.bio;
+        }
+        
+        // 保存
+        function addToBookmark() {
+            alert('この医師を保存しました。\n\n「保存済み」一覧からいつでも確認できます。');
+        }
+        
+        // 印刷
+        function printProfile() {
+            window.print();
+        }
+        
+        // 初期化
+        displayDoctorDetail();
+    </script>
+</body>
+</html>
